@@ -1,0 +1,22 @@
+const { _electron: electron } = require('@playwright/test');
+const path = require('path'); const fs = require('fs'); const os = require('os');
+(async () => {
+  const ud = fs.mkdtempSync(path.join(os.tmpdir(), 'jud-')); const wsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'jws-'));
+  const app = await electron.launch({ args: ['--no-sandbox', path.join(__dirname, '..')], env: { ...process.env, JAIMINHO_USERDATA: ud } });
+  app.process().stdout.on('data', (d) => process.stdout.write('[out] ' + d)); app.process().stderr.on('data', (d) => { if (!/gpu|dbus|viz/i.test(d)) process.stdout.write('[err] ' + d); });
+  const win = await app.firstWindow();
+  win.on('pageerror', (e) => console.log('[pageerror]', e.message));
+  await win.waitForSelector('[data-testid=welcome]');
+  await win.click('[data-testid=welcome-example]');
+  await app.evaluate(({ dialog }, d) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [d] }); }, wsDir);
+  await win.click('text=Criar workspace de exemplo…');
+  await win.waitForSelector('[data-testid="node-Listar viajantes"]', { timeout: 30000 });
+  await win.click('[data-testid="node-Listar viajantes"]');
+  await win.click('[data-testid=req-tab-scripts]'); await win.click('[data-testid=script-post]');
+  console.log('SCRIPT:', (await win.textContent('[data-testid=script-editor]')).slice(0, 200));
+  console.log('ENV:', await win.inputValue('[data-testid=env-select]'));
+  await win.click('[data-testid=btn-send]'); await win.waitForTimeout(2500);
+  console.log('STATUS:', await win.textContent('[data-testid=resp-status]'));
+  await win.click('[data-testid=resp-tab-console]'); console.log('CONSOLE:', await win.textContent('.box .subbody:last-child').catch(()=>'')); 
+  await app.evaluate(({ app: a }) => a.exit(0)).catch(() => {});
+})();

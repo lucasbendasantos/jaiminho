@@ -1,0 +1,8 @@
+[
+  {
+    "area": "processo",
+    "desc": "Script gRPC com loop de 10s não derruba conexões abertas de outras requests",
+    "pass": true,
+    "evidence": "http paralela ok=true ; grpc ok=true"
+  }
+]

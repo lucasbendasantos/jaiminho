@@ -1,0 +1,440 @@
+[
+  {
+    "area": "curl",
+    "desc": "bash multilinha com \\, -H, --data-raw JSON aninhado com aspas",
+    "pass": true,
+    "evidence": "POST http://127.0.0.1:41427/echo body={\"a\":{\"b\":\"c \\\"q\\\"\"},\"l\":[1,2]}"
+  },
+  {
+    "area": "curl",
+    "desc": "cmd do Windows (\"Copy as cURL (cmd)\" do Chrome: ^ e ^\\^\" e ^{)",
+    "pass": true,
+    "evidence": "POST http://127.0.0.1:41427/echo body enviado={\"a\":1}"
+  },
+  {
+    "area": "curl",
+    "desc": "PowerShell com crase e curl.exe",
+    "pass": true,
+    "evidence": "PUT http://127.0.0.1:41427/echo body=a=1"
+  },
+  {
+    "area": "curl",
+    "desc": "--data-urlencode (2x) vira urlencoded e chega decodificado",
+    "pass": true,
+    "evidence": "mode=urlencoded form={\"q\":\"a b&c\",\"n\":\"ç\"} raw=q=a%20b%26c&n=%C3%A7"
+  },
+  {
+    "area": "curl",
+    "desc": "-G com -d vira query string GET",
+    "pass": true,
+    "evidence": "GET url=http://127.0.0.1:41427/echo params=[{\"key\":\"a\",\"value\":\"1\",\"enabled\":true},{\"key\":\"b\",\"value\":\"2\",\"enabled\":true}] body={\"mode\":\"none\"}"
+  },
+  {
+    "area": "curl",
+    "desc": "-F texto e -F arquivo (@)",
+    "pass": [
+      {
+        "name": "nome",
+        "value": "José"
+      },
+      {
+        "name": "arq",
+        "filename": "qa-curl-up.txt",
+        "contentType": "text/plain",
+        "size": 2,
+        "content": "oi"
+      }
+    ],
+    "evidence": "{\"mode\":\"formdata\",\"formdata\":[{\"key\":\"nome\",\"value\":\"José\",\"type\":\"text\",\"enabled\":true},{\"key\":\"arq\",\"type\":\"file\",\"src\":\"/tmp/qa-curl-up.txt\",\"enabled\":true}]}"
+  },
+  {
+    "area": "curl",
+    "desc": "--compressed é aceito (Accept-Encoding)",
+    "pass": true,
+    "evidence": "[{\"key\":\"Accept-Encoding\",\"value\":\"gzip, deflate, br\",\"enabled\":true}]"
+  },
+  {
+    "area": "curl",
+    "desc": "-X DELETE sem body",
+    "pass": true,
+    "evidence": "{\"mode\":\"none\"}"
+  },
+  {
+    "area": "curl",
+    "desc": "-H 'Cookie: a=1; b=2' é enviado",
+    "pass": true,
+    "evidence": "{\"a\":\"1\",\"b\":\"2\"}"
+  },
+  {
+    "area": "curl",
+    "desc": "-b (cookie) é enviado",
+    "pass": true,
+    "evidence": "headers=[{\"key\":\"Cookie\",\"value\":\"a=1\",\"enabled\":true}] cookies={\"a\":\"1\"}"
+  },
+  {
+    "area": "curl",
+    "desc": "-u user:senha vira Basic auth",
+    "pass": true,
+    "evidence": "{\"type\":\"basic\",\"basic\":{\"username\":\"jaiminho\",\"password\":\"carteiro\"}}"
+  },
+  {
+    "area": "curl",
+    "desc": "Authorization: Bearer vira auth Bearer",
+    "pass": true,
+    "evidence": "{\"type\":\"bearer\",\"bearer\":{\"token\":\"jaiminho-token\"}}"
+  },
+  {
+    "area": "curl",
+    "desc": "-k vira SSL off",
+    "pass": true,
+    "evidence": "{\"verifySsl\":false}"
+  },
+  {
+    "area": "curl",
+    "desc": "-sSk (flags combinadas) vira SSL off",
+    "pass": true,
+    "evidence": "settings={\"verifySsl\":false} error=undefined"
+  },
+  {
+    "area": "curl",
+    "desc": "-L e -I (HEAD)",
+    "pass": true,
+    "evidence": "HEAD"
+  },
+  {
+    "area": "curl",
+    "desc": "URL sem protocolo (curl localhost:porta/echo)",
+    "pass": true,
+    "evidence": "url=http://localhost:41427/echo error=undefined"
+  },
+  {
+    "area": "curl",
+    "desc": "cURL com {{variável}} preservada",
+    "pass": true,
+    "evidence": "{{baseUrl}}/echo [{\"key\":\"X\",\"value\":\"{{tok}}\",\"enabled\":true}]"
+  },
+  {
+    "area": "curl",
+    "desc": "cURL do DevTools Chrome (\"Copy as cURL (bash)\") com $'..' e --data-raw",
+    "pass": true,
+    "evidence": "body={\"mode\":\"raw\",\"language\":\"json\",\"raw\":\"{\\\"t\\\":\\\"linha1\\\\nlinha2\\\"}\"} recebido={\"t\":\"linha1\\nlinha2\"}"
+  },
+  {
+    "area": "curl",
+    "desc": "SOAP colado via cURL vira request SOAP",
+    "pass": true,
+    "evidence": "{\"kind\":\"soap\",\"soap\":{\"version\":\"1.1\",\"action\":\"urn:GetTraveller\"}}"
+  },
+  {
+    "area": "curl",
+    "desc": "Texto \"$ curl ...\" (prompt copiado) é reconhecido",
+    "pass": true,
+    "evidence": "ok"
+  },
+  {
+    "area": "curl",
+    "desc": "Export cURL bash/cmd/PowerShell → reimport preserva método/headers/corpo JSON com aspas e acento",
+    "pass": true,
+    "evidence": "{\"bash\":{\"ok\":true},\"cmd\":{\"ok\":true},\"powershell\":{\"ok\":true}}"
+  },
+  {
+    "area": "curl",
+    "desc": "Export cURL bash executado de verdade no shell chega igual no servidor",
+    "pass": true,
+    "evidence": "curl -L 'http://127.0.0.1:41427/echo' \\\n-H 'X-A: it'\\''s' \\\n-H 'Content-Type: application/json' \\\n-d '{\"a\":\"it'\\''s ç\"}'"
+  },
+  {
+    "area": "curl",
+    "desc": "Export cURL com auth herdada da coleção (resolveRequest materializa)",
+    "pass": true,
+    "evidence": "curl -L 'http://127.0.0.1:41427/echo' \\\n-H 'Authorization: Bearer T1'"
+  },
+  {
+    "area": "curl",
+    "desc": "Export cURL de form-data com arquivo e de body binário",
+    "pass": true,
+    "evidence": "curl -L 'http://127.0.0.1:41427/echo' \\\n-F 'f=@\"/tmp/a b.txt\"' \\\n-F 't=\"v\"'"
+  },
+  {
+    "area": "curl",
+    "desc": "Codegen (Python requests, Node axios, Java OkHttp) gera código",
+    "pass": true,
+    "evidence": "[true,true,true]"
+  },
+  {
+    "area": "postman",
+    "desc": "Import coleção v2.1 completa (pastas, auth multinível, scripts, vars, path vars, examples, form-data)",
+    "pass": true,
+    "evidence": "{\"requests\":9,\"folders\":2,\"warnings\":[]}"
+  },
+  {
+    "area": "postman",
+    "desc": "Coleção importada: segredo não fica no YAML e var disabled preservada",
+    "pass": true,
+    "evidence": "id: 01a16d67-46c7-78c6-acb7-7545901825ca\nname: Coleção QA ç\ndescription: desc\nauth:\n  type: bearer\n  bearer:\n    token: \"{{tok}}\"\nscripts:\n  pre: pm.variables.set(\"colPre\", \"1\")\nvars:\n  - key: baseUrl\n    value: http://127.0.0.1:41427\n  - key: senha\n    secret: true\n  - key: off\n    value: x\n    enabled: false\n"
+  },
+  {
+    "area": "postman",
+    "desc": "Request importada com path var + query desabilitada + header desabilitado envia certo",
+    "pass": true,
+    "evidence": "{\"path\":\"/echo/77\",\"q\":{\"q\":\"1\"},\"h\":\"h\",\"key\":\"chave-123\"}"
+  },
+  {
+    "area": "postman",
+    "desc": "Auth herdada (apikey da pasta) e noauth/basic por request",
+    "pass": true,
+    "evidence": "200,401,200"
+  },
+  {
+    "area": "postman",
+    "desc": "Script de pasta (test) e de coleção (pre) rodam na request importada",
+    "pass": true,
+    "evidence": "[{\"name\":\"pasta\",\"passed\":true,\"skipped\":false}]"
+  },
+  {
+    "area": "postman",
+    "desc": "protocolProfileBehavior (strictSSL/followRedirects) importado",
+    "pass": true,
+    "evidence": "302 settings={\"verifySsl\":false,\"followRedirects\":false}"
+  },
+  {
+    "area": "postman",
+    "desc": "SOAP do Postman vira request SOAP",
+    "pass": true,
+    "evidence": "{\"kind\":\"soap\",\"soap\":{\"version\":\"1.1\",\"action\":\"urn:x\"}}"
+  },
+  {
+    "area": "postman",
+    "desc": "Examples (responses salvas) importados",
+    "pass": true,
+    "evidence": "[{\"name\":\"Exemplo 200\",\"status\":200,\"statusText\":\"OK\",\"headers\":[{\"key\":\"Content-Type\",\"value\":\"application/json\",\"enabled\":true}],\"body\":\"{\\\"ok\\\":true}\"}]"
+  },
+  {
+    "area": "postman",
+    "desc": "Export Postman → reimport no Postman-format (ida e volta) mantém tudo",
+    "pass": true,
+    "evidence": "idêntico"
+  },
+  {
+    "area": "postman",
+    "desc": "Export Postman passa no validador de schema do postman-collection (sdk)",
+    "pass": true,
+    "evidence": "itens=7"
+  },
+  {
+    "area": "postman",
+    "desc": "Export Postman de request gRPC → reimport no Jaiminho continua gRPC",
+    "pass": true,
+    "evidence": "kind após reimport=grpc method=undefined url=grpc://127.0.0.1:46177"
+  },
+  {
+    "area": "postman",
+    "desc": "Export Postman de request com vars de pasta (Jaiminho) — informativo",
+    "pass": true,
+    "evidence": "vars de pasta no export: undefined (Postman v2.1 aceita \"variable\" em pasta)"
+  },
+  {
+    "area": "postman",
+    "desc": "Import ambiente Postman com secret (valor vai para o cofre, não para o YAML)",
+    "pass": true,
+    "evidence": "id: 01a16d67-4ab2-7954-93fb-0b17a74fdfa9\nname: Prod\nvars:\n  - key: url\n    value: http://127.0.0.1:41427\n  - key: pwd\n    secret: true\n  - key: off\n    value: \"1\"\n    enabled: false\n"
+  },
+  {
+    "area": "postman",
+    "desc": "Export ambiente: segredo sai vazio",
+    "pass": true,
+    "evidence": "[{\"key\":\"s\",\"value\":\"\",\"type\":\"secret\",\"enabled\":true},{\"key\":\"p\",\"value\":\"y\",\"type\":\"default\",\"enabled\":true}]"
+  },
+  {
+    "area": "postman",
+    "desc": "Import globals do Postman",
+    "pass": true,
+    "evidence": "[{\"key\":\"g\",\"value\":\"1\"}]"
+  },
+  {
+    "area": "postman",
+    "desc": "Import Postman Collection v2.0 (formato antigo, auth como objeto)",
+    "pass": true,
+    "evidence": "200 auth={\"type\":\"basic\",\"basic\":{\"username\":\"jaiminho\",\"password\":\"carteiro\"}}"
+  },
+  {
+    "area": "postman",
+    "desc": "Import Postman com URL como objeto sem raw (host/path arrays)",
+    "pass": true,
+    "evidence": "url=http://127.0.0.1:41427/echo {\"a\":\"1\"}"
+  },
+  {
+    "area": "postman",
+    "desc": "Import Postman com request description objeto e item sem request",
+    "pass": true,
+    "evidence": "{\"requests\":1,\"folders\":0,\"warnings\":[]}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger 3 por URL direta (JSON) com createEnvironments",
+    "pass": true,
+    "evidence": "9 requests, envs=2 spec={\"title\":\"Jaiminho Mock - Travellers API\",\"version\":\"1.0.0\",\"openapi\":\"3.0.3\"}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger por URL YAML",
+    "pass": true,
+    "evidence": "{\"title\":\"Jaiminho Mock - Travellers API\",\"version\":\"1.0.0\",\"openapi\":\"3.0.3\"}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger 2.0 por URL",
+    "pass": true,
+    "evidence": "{\"title\":\"Jaiminho Mock - Swagger 2\",\"version\":\"1.0.0\",\"openapi\":\"2.0\"}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger pela URL do Swagger UI (springdoc) e pela base do serviço",
+    "pass": true,
+    "evidence": "{\"title\":\"Jaiminho Mock - Travellers API\",\"version\":\"1.0.0\",\"openapi\":\"3.0.3\"} {\"title\":\"Jaiminho Mock - Travellers API\",\"version\":\"1.0.0\",\"openapi\":\"3.0.3\"}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Requests importadas do Swagger funcionam (baseUrl resolvido)",
+    "pass": true,
+    "evidence": "Listar viajantes:200 | Buscar viajante por id:200 | Viajante em XML:200"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger UI com context-path (/api/swagger-ui/index.html) — springdoc atrás de context path",
+    "pass": true,
+    "evidence": "{\"title\":\"Ctx\",\"version\":\"1\",\"openapi\":\"3.0.1\"}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger por arquivo com $ref (componentes) gera body de exemplo",
+    "pass": true,
+    "evidence": "{\"mode\":\"raw\",\"language\":\"json\",\"raw\":\"{\\n  \\\"nome\\\": \\\"Ana\\\",\\n  \\\"idade\\\": 685\\n}\"}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger com $ref para ARQUIVO externo (./schemas.yaml) — informativo",
+    "pass": true,
+    "evidence": "{\"mode\":\"raw\",\"language\":\"json\",\"raw\":\"{\\n  \\\"nome\\\": \\\"Bia\\\"\\n}\"}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Coleção importada por arquivo não grava caminho ABSOLUTO no YAML partilhado",
+    "pass": true,
+    "evidence": "  file: data/specs/ref.json"
+  },
+  {
+    "area": "openapi",
+    "desc": "Sincronizar Swagger (importado por URL): detecta nova/alterada/removida e aplica mantendo scripts",
+    "pass": true,
+    "evidence": "{\"added\":1,\"removed\":1,\"changed\":1,\"scripts\":{\"post\":\"pm.test(\\\"meu\\\", () => {})\"},\"params\":[{\"key\":\"novo\",\"value\":\"string\",\"enabled\":false}]}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Sincronizar Swagger importado por ARQUIVO/colado (como o app faz: texto) sem reenviar o texto",
+    "pass": true,
+    "evidence": "{\"added\":[],\"removed\":[],\"changed\":[],\"unchanged\":1}"
+  },
+  {
+    "area": "openapi",
+    "desc": "Swagger inválido → erro claro",
+    "pass": true,
+    "evidence": "Swagger inválido: não tem nenhuma rota em \"paths\""
+  },
+  {
+    "area": "wsdl",
+    "desc": "WSDL por URL (?wsdl) cria operações SOAP 1.1 e 1.2",
+    "pass": true,
+    "evidence": "4 ops versões=1.1,1.2"
+  },
+  {
+    "area": "wsdl",
+    "desc": "WSDL por URL \"?singleWsdl\" (WCF/.NET) ou \"?WSDL\" maiúsculo",
+    "pass": true,
+    "evidence": "WSDL:wsdl | singleWsdl:wsdl"
+  },
+  {
+    "area": "wsdl",
+    "desc": "WSDL colado como texto",
+    "pass": true,
+    "evidence": "4"
+  },
+  {
+    "area": "wsdl",
+    "desc": "WSDL com prefixo de binding SOAP 1.2 diferente de \"soap12:\" (ex.: \"s12:\")",
+    "pass": true,
+    "evidence": "versões detectadas=1.1,1.2"
+  },
+  {
+    "area": "wsdl",
+    "desc": "WSDL 2.0 → mensagem clara",
+    "pass": true,
+    "evidence": "Formato não reconhecido. Aceito: cURL, grpcurl, coleção/ambiente/backup do Postman, Swagger/OpenAPI (JSON/YAML), WSDL, bundle .jaiminho"
+  },
+  {
+    "area": "bundle",
+    "desc": "Bundle workspace: ida e volta entre dois workspaces sem segredos nem .jaiminho/",
+    "pass": true,
+    "evidence": "arquivos=.gitignore,collections/,collections/col-b/,collections/col-b/010-r.req.yaml,collections/col-b/_collection.yaml,environments/,environments/e.env.yaml,jaiminho.yaml,manifest.json res={\"type\":\"bundle\",\"collections\":[\"Col B\"],\"environments\":[\"E\"],\"files\":3,\"skipped\":[]}"
+  },
+  {
+    "area": "bundle",
+    "desc": "Bundle reimportado no MESMO workspace (keep-both) cria cópia com ids novos",
+    "pass": true,
+    "evidence": "coleções=[\"X\",\"X (importada)\"] itens=6"
+  },
+  {
+    "area": "bundle",
+    "desc": "Bundle com conflito: overwrite e skip",
+    "pass": true,
+    "evidence": "skip={\"collections\":[],\"environments\":[],\"files\":0,\"skipped\":[\"X\"]} filhos após overwrite=1"
+  },
+  {
+    "area": "bundle",
+    "desc": "Bundle corrompido (byte alterado) é recusado com mensagem",
+    "pass": true,
+    "evidence": "Bundle corrompido: hash não confere: collections/x/_collection.yaml"
+  },
+  {
+    "area": "bundle",
+    "desc": "Arquivo .jaiminho que não é zip → erro claro",
+    "pass": true,
+    "evidence": "Can't find end of central directory : is this a zip file ? If it is, see https://stuk.github.io/jszip/documentation/howto/read_zip.html"
+  },
+  {
+    "area": "bundle",
+    "desc": "SEGURANÇA: bundle malicioso com caminho \"../\" não escreve fora do workspace (zip slip)",
+    "pass": true,
+    "evidence": "bloqueado: Bundle corrompido: faltando: ../qa-zipslip-1792836849895.txt"
+  },
+  {
+    "area": "bundle",
+    "desc": "SEGURANÇA: bundle com \"collections/../.jaiminho/secrets.enc\" não sobrescreve segredos locais",
+    "pass": true,
+    "evidence": "bloqueado: Bundle corrompido: faltando: collections/../.jaiminho/secrets.enc; caminho inseguro no zip: /"
+  },
+  {
+    "area": "bundle",
+    "desc": "Bundle de coleção leva os .proto/.protoset usados",
+    "pass": true,
+    "evidence": "collections/,collections/g/,collections/g/_collection.yaml,jaiminho.yaml,protos/,protos/x.protoset,manifest.json"
+  },
+  {
+    "area": "bundle",
+    "desc": "Bundle de coleção leva o arquivo de body grande (>4KB) e o reimport lê o body",
+    "pass": true,
+    "evidence": "len=6008"
+  },
+  {
+    "area": "bundle",
+    "desc": "Bundle de ambiente sozinho",
+    "pass": true,
+    "evidence": "[{\"id\":\"01a16d67-5102-7e4b-a654-77ddff1225f5\",\"name\":\"Prod\",\"vars\":[{\"key\":\"u\",\"value\":\"1\"}]}]"
+  },
+  {
+    "area": "import",
+    "desc": "importAuto com texto aleatório → erro claro",
+    "pass": true,
+    "evidence": "Formato não reconhecido. Aceito: cURL, grpcurl, coleção/ambiente/backup do Postman, Swagger/OpenAPI (JSON/YAML), WSDL, bundle .jaiminho"
+  }
+]

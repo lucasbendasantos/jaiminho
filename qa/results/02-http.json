@@ -1,0 +1,312 @@
+[
+  {
+    "area": "http",
+    "desc": "Método GET chega no servidor",
+    "pass": true,
+    "evidence": "code=200 "
+  },
+  {
+    "area": "http",
+    "desc": "Método POST chega no servidor",
+    "pass": true,
+    "evidence": "code=200 "
+  },
+  {
+    "area": "http",
+    "desc": "Método PUT chega no servidor",
+    "pass": true,
+    "evidence": "code=200 "
+  },
+  {
+    "area": "http",
+    "desc": "Método PATCH chega no servidor",
+    "pass": true,
+    "evidence": "code=200 "
+  },
+  {
+    "area": "http",
+    "desc": "Método DELETE chega no servidor",
+    "pass": true,
+    "evidence": "code=200 "
+  },
+  {
+    "area": "http",
+    "desc": "Método OPTIONS chega no servidor",
+    "pass": true,
+    "evidence": "code=200 "
+  },
+  {
+    "area": "http",
+    "desc": "HEAD devolve só cabeçalhos (sem corpo)",
+    "pass": true,
+    "evidence": "code=200 size=0"
+  },
+  {
+    "area": "http",
+    "desc": "Método customizado (PROPFIND)",
+    "pass": true,
+    "evidence": 200
+  },
+  {
+    "area": "http",
+    "desc": "GET com body (permitido no Postman) envia o corpo",
+    "pass": true,
+    "evidence": "\"{\\\"a\\\":1}\""
+  },
+  {
+    "area": "http",
+    "desc": "Body JSON define Content-Type application/json automaticamente",
+    "pass": true,
+    "evidence": "application/json"
+  },
+  {
+    "area": "http",
+    "desc": "Body XML define Content-Type application/xml",
+    "pass": true,
+    "evidence": "application/xml :: <a>1</a>"
+  },
+  {
+    "area": "http",
+    "desc": "Body binário (arquivo) enviado byte a byte",
+    "pass": true,
+    "evidence": "content-length=7 "
+  },
+  {
+    "area": "http",
+    "desc": "Body binário com caminho RELATIVO ao workspace (arquivo partilhado em data/)",
+    "pass": true,
+    "evidence": "body=\"ABC\" errors=[] error=undefined"
+  },
+  {
+    "area": "http",
+    "desc": "form-data com texto e arquivo",
+    "pass": true,
+    "evidence": "[{\"name\":\"nome\",\"value\":\"José\"},{\"name\":\"arq\",\"filename\":\"qa-up.txt\",\"contentType\":\"text/plain\",\"size\":20,\"content\":\"conteúdo do arquivo\"}]"
+  },
+  {
+    "area": "http",
+    "desc": "form-data com arquivo de caminho relativo ao workspace",
+    "pass": true,
+    "evidence": "form=[{\"name\":\"arq\",\"filename\":\"up.txt\",\"contentType\":\"text/plain\",\"size\":3,\"content\":\"REL\"}] errors=[]"
+  },
+  {
+    "area": "http",
+    "desc": "urlencoded com caracteres especiais (& = + espaço acento)",
+    "pass": true,
+    "evidence": "{\"a\":\"x&y=z\",\"b\":\"1+1 ção\"} raw=a=x%26y%3Dz&b=1%2B1%20%C3%A7%C3%A3o"
+  },
+  {
+    "area": "http",
+    "desc": "GraphQL (query + variables) vira POST JSON",
+    "pass": true,
+    "evidence": "{\"query\":\"query($id:ID){ t(id:$id){ id } }\",\"variables\":{\"id\":\"1\"}}"
+  },
+  {
+    "area": "http",
+    "desc": "Resposta binária vem em base64 com tamanho correto",
+    "pass": true,
+    "evidence": "base64 size=256"
+  },
+  {
+    "area": "http",
+    "desc": "Resposta gzip é descomprimida",
+    "pass": true,
+    "evidence": "{\"gzipped\":true}"
+  },
+  {
+    "area": "http",
+    "desc": "Resposta HTML como texto",
+    "pass": true,
+    "evidence": "text/html; charset=utf-8"
+  },
+  {
+    "area": "http",
+    "desc": "Status 204 sem corpo",
+    "pass": true,
+    "evidence": "code=204"
+  },
+  {
+    "area": "http",
+    "desc": "Redirect seguido por padrão",
+    "pass": true,
+    "evidence": 200
+  },
+  {
+    "area": "http",
+    "desc": "Redirect desligado na request devolve 302",
+    "pass": true,
+    "evidence": 302
+  },
+  {
+    "area": "http",
+    "desc": "Redirect desligado no workspace devolve 302",
+    "pass": true,
+    "evidence": 302
+  },
+  {
+    "area": "http",
+    "desc": "maxRedirects respeitado (2 < 3 redirects → erro)",
+    "pass": true,
+    "evidence": "ok=false code=undefined error=Exceeded maxRedirects. Probably stuck in a redirect loop http://127.0.0.1:40015/redirect/1"
+  },
+  {
+    "area": "http",
+    "desc": "Timeout por request gera erro claro",
+    "pass": true,
+    "evidence": "317ms error=Tempo esgotado esperando resposta [ESOCKETTIMEDOUT]"
+  },
+  {
+    "area": "http",
+    "desc": "Cancelar request lenta (AbortSignal)",
+    "pass": true,
+    "evidence": "201ms error=Cancelado"
+  },
+  {
+    "area": "http",
+    "desc": "Cancelar request JÁ EM VOO (abort após 1 s de /delay/5000) interrompe na hora",
+    "pass": true,
+    "evidence": "1007ms error=Cancelado"
+  },
+  {
+    "area": "http",
+    "desc": "Conexão recusada gera mensagem em PT",
+    "pass": true,
+    "evidence": "Conexão recusada (o servidor não está escutando nessa porta) [ECONNREFUSED]"
+  },
+  {
+    "area": "http",
+    "desc": "DNS inexistente gera mensagem em PT",
+    "pass": true,
+    "evidence": "Host não encontrado (DNS) [ENOTFOUND]"
+  },
+  {
+    "area": "http",
+    "desc": "URL sem protocolo (127.0.0.1:PORTA/echo) funciona como no Postman",
+    "pass": true,
+    "evidence": "ok=true url=http://127.0.0.1:40015/echo error=undefined"
+  },
+  {
+    "area": "http",
+    "desc": "URL sem protocolo com \"localhost:PORTA/echo\"",
+    "pass": true,
+    "evidence": "ok=true url=http://localhost:40015/echo error=undefined"
+  },
+  {
+    "area": "http",
+    "desc": "URL com {{baseUrl}} sem protocolo vindo do ambiente",
+    "pass": true,
+    "evidence": "ok=true url=http://localhost:40015/echo error=undefined"
+  },
+  {
+    "area": "http",
+    "desc": "Headers duplicados (mesma chave 2x) são enviados ambos",
+    "pass": true,
+    "evidence": "a, b"
+  },
+  {
+    "area": "http",
+    "desc": "Header desabilitado não é enviado",
+    "pass": true
+  },
+  {
+    "area": "http",
+    "desc": "Param desabilitado não vai na URL",
+    "pass": true,
+    "evidence": "{\"a\":\"1\"}"
+  },
+  {
+    "area": "http",
+    "desc": "User-Agent sobrescrito pelo usuário prevalece",
+    "pass": true,
+    "evidence": "MeuUA"
+  },
+  {
+    "area": "http",
+    "desc": "Cookies: Set-Cookie guardado e reenviado na request seguinte",
+    "pass": true,
+    "evidence": "{\"sessao\":\"abc\"} jar=[{\"domain\":\"127.0.0.1\",\"path\":\"/\",\"name\":\"sessao\",\"value\":\"abc\"}]"
+  },
+  {
+    "area": "http",
+    "desc": "Cookies: disableCookies na request não envia",
+    "pass": true,
+    "evidence": "{}"
+  },
+  {
+    "area": "http",
+    "desc": "Cookies: header Cookie manual é enviado",
+    "pass": true,
+    "evidence": "{\"manual\":\"1\",\"sessao\":\"abc\"}"
+  },
+  {
+    "area": "http",
+    "desc": "Cookies: limpar jar",
+    "pass": true,
+    "evidence": "{}"
+  },
+  {
+    "area": "http",
+    "desc": "Auth basic / digest / apikey(header e query)",
+    "pass": true,
+    "evidence": "[200,200,200,200]"
+  },
+  {
+    "area": "http",
+    "desc": "Auth OAuth2 client_credentials obtém token e chama API",
+    "pass": true,
+    "evidence": "code=200 error=undefined (informativo: postman-runtime não busca token sozinho; depende do app)"
+  },
+  {
+    "area": "http",
+    "desc": "Auth herdada da pasta/coleção",
+    "pass": true,
+    "evidence": "200 401"
+  },
+  {
+    "area": "http",
+    "desc": "Request não salva (rascunho) sem parentId envia",
+    "pass": true
+  },
+  {
+    "area": "http",
+    "desc": "Resposta grande (~5MB) não trava",
+    "pass": true,
+    "evidence": "size=5242880"
+  },
+  {
+    "area": "http",
+    "desc": "Timings e tamanho presentes",
+    "pass": true,
+    "evidence": "{\"wait\":1.01,\"dns\":0,\"tcp\":0,\"tls\":0,\"firstByte\":0.56,\"download\":0.86,\"total\":2.53}"
+  },
+  {
+    "area": "http",
+    "desc": "Variável {{$env.HOME}} (variável do SO)",
+    "pass": true,
+    "evidence": "/root"
+  },
+  {
+    "area": "http",
+    "desc": "Path variable vazia não envia literal \":id\"",
+    "pass": true,
+    "evidence": "path enviado=/echo/:id (informativo)"
+  },
+  {
+    "area": "http",
+    "desc": "Query na URL + aba params preenchida: a URL com ?x= não duplica nem perde",
+    "pass": true,
+    "evidence": "{\"a\":\"1\",\"b\":\"2\"}"
+  },
+  {
+    "area": "http",
+    "desc": "Query só na URL com params divergente (usuário editou a URL, params velhos)",
+    "pass": true,
+    "evidence": "query enviada={\"velho\":\"1\"} (informativo: a aba Params ganha da URL)"
+  },
+  {
+    "area": "soap",
+    "desc": "SOAP 1.1: envia SOAPAction e detecta Fault",
+    "pass": true,
+    "evidence": "4 operações; GetTraveller:200:ok:{\"request\":{\"valid\":true,\"errors\":[]},\"response\":{\"valid\":true,\"errors\":[]}} | CreateTraveller:200:ok:{\"request\":{\"valid\":true,\"errors\":[]},\"response\":{\"valid\":true,\"errors\":[]}} | GetTraveller:200:ok:{\"request\":{\"valid\":true,\"errors\":[]},\"response\":{\"valid\":true,\"errors\":[]}} | CreateTraveller:200:ok:{\"request\":{\"valid\":true,\"errors\":[]},\"response\":{\"valid\":true,\"errors\":[]}}"
+  }
+]

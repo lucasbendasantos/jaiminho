@@ -1,0 +1,158 @@
+[
+  {
+    "area": "variáveis",
+    "desc": "Precedência global < coleção < ambiente < pasta < request < data",
+    "pass": true,
+    "evidence": "obtido={\"a\":\"G\",\"b\":\"C\",\"c\":\"E\",\"d\":\"F\",\"e\":\"R\",\"f\":\"D\"} esperado={\"a\":\"G\",\"b\":\"C\",\"c\":\"E\",\"d\":\"F\",\"e\":\"R\",\"f\":\"D\"}"
+  },
+  {
+    "area": "variáveis",
+    "desc": "Variável não resolvida fica literal {{x}} e resolveRequest/unresolved a detectam",
+    "pass": true,
+    "evidence": "{\"x\":\"{{naoExiste}}\"}"
+  },
+  {
+    "area": "variáveis",
+    "desc": "Dinâmicas $guid/$timestamp/$isoTimestamp/$randomEmail/$randomInt resolvidas",
+    "pass": true,
+    "evidence": "{\"g\":\"516864b4-64b3-49f5-85bb-49e9f7b7e043\",\"t\":\"1792836812\",\"i\":\"2026-10-24T10:13:31.941Z\",\"e\":\"German_Collier95@hotmail.com\",\"n\":\"13\"}"
+  },
+  {
+    "area": "variáveis",
+    "desc": "{{var}} em header, body raw, auth bearer, path variable e params",
+    "pass": true,
+    "evidence": "{\"path\":\"/echo/42\",\"q\":{\"q\":\"QV\"},\"h\":\"HV\",\"auth\":\"Bearer TK\",\"json\":{\"b\":\"BV\"}}"
+  },
+  {
+    "area": "variáveis",
+    "desc": "Variável na URL com query (?a={{x}}) e acentos/UTF-8 em query e body",
+    "pass": true,
+    "evidence": "query={\"a\":\"São João \",\" ç\":\"\",\"b\":\"ação\"} url=http://127.0.0.1:42449/echo?a=S%C3%A3o%20Jo%C3%A3o%20&%20%C3%A7&b=a%C3%A7%C3%A3o json={\"nome\":\"São João & ç\",\"emoji\":\"🚀\"}"
+  },
+  {
+    "area": "variáveis",
+    "desc": "Valor de variável com \"&\" usado em query (Postman não codifica &; documenta comportamento)",
+    "pass": true,
+    "evidence": "query recebida={\"q\":\"a\",\"b\":\"c\"} (informativo)"
+  },
+  {
+    "area": "variáveis",
+    "desc": "Valor local sobrepõe partilhado e não vai para o YAML",
+    "pass": true,
+    "evidence": "local"
+  },
+  {
+    "area": "variáveis",
+    "desc": "Segredo em coleção e em global: resolvido no envio e ausente do YAML",
+    "pass": true,
+    "evidence": "{\"c\":\"SEGREDO-COL\",\"g\":\"SEGREDO-GLO\"}"
+  },
+  {
+    "area": "scripts",
+    "desc": "pm.environment.set de variável NOVA (não declarada) fica disponível na request seguinte",
+    "pass": true,
+    "evidence": "variablesChanged=[{\"scope\":\"environment\",\"key\":\"tokenNovo\",\"value\":\"abc123\"}] | 2ª request recebeu t=abc123 | local-values={\"env:01a16d66-bd3b-78c7-8eb7-c8b79a2375df\":{\"tokenNovo\":\"abc123\"}}"
+  },
+  {
+    "area": "scripts",
+    "desc": "pm.collectionVariables.set e pm.globals.set de variável NOVA persistem para a próxima request",
+    "pass": true,
+    "evidence": "{\"c\":\"C1\",\"g\":\"G1\"}"
+  },
+  {
+    "area": "scripts",
+    "desc": "pm.environment.set em variável JÁ declarada atualiza o valor corrente",
+    "pass": true,
+    "evidence": "{\"t\":\"GET\"}"
+  },
+  {
+    "area": "scripts",
+    "desc": "pm.environment.unset remove o valor corrente (request seguinte não deve mais ver o valor)",
+    "pass": true,
+    "evidence": "variablesChanged=[{\"scope\":\"environment\",\"key\":\"tok\",\"removed\":true}]; request seguinte recebeu t={{tok}}"
+  },
+  {
+    "area": "scripts",
+    "desc": "Pre-request pm.variables.set usado na mesma request",
+    "pass": true,
+    "evidence": "{\"v\":\"PRE\"}"
+  },
+  {
+    "area": "scripts",
+    "desc": "pm.sendRequest dentro do pre-request",
+    "pass": true,
+    "evidence": "{\"v\":\"1\"}"
+  },
+  {
+    "area": "scripts",
+    "desc": "pm.expect falhando vira teste reprovado com mensagem",
+    "pass": true,
+    "evidence": "[{\"name\":\"é 200\",\"passed\":false,\"skipped\":false,\"error\":\"expected response to have status code 200 but got 404\"},{\"name\":\"passa\",\"passed\":true,\"skipped\":false}]"
+  },
+  {
+    "area": "scripts",
+    "desc": "Erro de sintaxe no script vira mensagem clara e a request ainda é enviada",
+    "pass": true,
+    "evidence": "ok=true code=200 errors=[\"Unexpected token ';'\",\"Pre-request: Unexpected token ';'\",\"Unexpected end of input\",\"Script de teste: Unexpected end of input\"] error=undefined"
+  },
+  {
+    "area": "scripts",
+    "desc": "Loop infinito no pre-request é interrompido por timeout (sem travar)",
+    "pass": true,
+    "evidence": "10539ms ok=true error=undefined errors=[\"Pre-request: sandbox not responding\"]"
+  },
+  {
+    "area": "scripts",
+    "desc": "pm.response.json() em resposta HTML gera erro legível no teste",
+    "pass": true,
+    "evidence": "[{\"name\":\"json\",\"passed\":false,\"skipped\":false,\"error\":\"JSONError: resposta não é JSON válido — Unexpected token '<' at 1:1\\n<!doctype html><html><body><h1>Jaiminho</h1></body></html>\\n^\"}]"
+  },
+  {
+    "area": "scripts",
+    "desc": "Scripts de coleção e pasta rodam antes do da request (herança)",
+    "pass": true,
+    "evidence": "{\"o\":\"CFR\"}"
+  },
+  {
+    "area": "scripts",
+    "desc": "console.log do script chega no resultado",
+    "pass": true,
+    "evidence": "[{\"level\":\"log\",\"args\":[\"olá\",\"{\\\"a\\\":1}\"]}]"
+  },
+  {
+    "area": "scripts",
+    "desc": "Variáveis de pasta disponíveis via pm.variables e não poluem pm.iterationData",
+    "pass": true,
+    "evidence": "[{\"name\":\"pv\",\"passed\":true,\"skipped\":false},{\"name\":\"iter\",\"passed\":true,\"skipped\":false}]"
+  },
+  {
+    "area": "runner",
+    "desc": "Runner com CSV de dados (2 iterações) e relatório JUnit",
+    "pass": true,
+    "evidence": "{\"requests\":2,\"failed\":0,\"tests\":2,\"testsFailed\":0} data=[{\"nome\":\"Silva, Ana\",\"idade\":\"30\"},{\"nome\":\"João\",\"idade\":\"40\"}]"
+  },
+  {
+    "area": "runner",
+    "desc": "parseDataFile CSV com quebra de linha dentro de aspas",
+    "pass": true,
+    "evidence": "[{\"a\":\"linha1\\nlinha2\",\"b\":\"x\"}]"
+  },
+  {
+    "area": "runner",
+    "desc": "parseDataFile CSV com BOM (Excel) mantém o nome da 1ª coluna",
+    "pass": true,
+    "evidence": "[\"nome\",\"idade\"]"
+  },
+  {
+    "area": "runner",
+    "desc": "parseDataFile CSV separado por ponto-e-vírgula (Excel PT/BR)",
+    "pass": true,
+    "evidence": "[{\"nome\":\"Ana\",\"idade\":\"1\"}]"
+  },
+  {
+    "area": "runner",
+    "desc": "Runner: stopOnFailure para na 1ª falha; delay respeitado",
+    "pass": true,
+    "evidence": "{\"requests\":1,\"failed\":1,\"tests\":1,\"testsFailed\":1}"
+  }
+]

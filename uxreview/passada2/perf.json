@@ -1,0 +1,121 @@
+[
+  {
+    "name": "Abrir workspace com 3.000 requests (árvore aparece)",
+    "ok": true,
+    "wall": 1380,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "linhas no DOM=62",
+    "bad": []
+  },
+  {
+    "name": "Expandir uma pasta de 50 itens",
+    "ok": true,
+    "wall": 104,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Clicar numa request da árvore (seleção + abrir aba)",
+    "ok": true,
+    "wall": 46,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Recolher a pasta",
+    "ok": true,
+    "wall": 56,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Digitar no filtro da árvore (busca \"Req 59-4\")",
+    "ok": true,
+    "wall": 117,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "linhas filtradas=13",
+    "bad": []
+  },
+  {
+    "name": "Navegar na árvore com as setas (20 teclas)",
+    "ok": true,
+    "wall": 94,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Resposta JSON de 2 MB: enviar e mostrar",
+    "ok": true,
+    "wall": 491,
+    "max": 96,
+    "total": 147,
+    "n": 2,
+    "extra": "200 OKentregue em 43 ms2.00 MB",
+    "bad": []
+  },
+  {
+    "name": "Resposta JSON de 20 MB: enviar e mostrar",
+    "ok": true,
+    "wall": 1252,
+    "max": 458,
+    "total": 458,
+    "n": 1,
+    "extra": "200 OKentregue em 309 ms20.00 MB",
+    "bad": []
+  },
+  {
+    "name": "Trocar de aba com a resposta de 20 MB aberta",
+    "ok": true,
+    "wall": 149,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "gRPC server-streaming com 5.000 mensagens: invocar e mostrar",
+    "ok": true,
+    "wall": 2826,
+    "max": 105,
+    "total": 174,
+    "n": 2,
+    "extra": "OK (0)entregue em 814 ms5000 mensagens",
+    "bad": []
+  },
+  {
+    "name": "Reenviar a mesma request 5 vezes seguidas (sem acumular lentidão)",
+    "ok": true,
+    "wall": 4049,
+    "max": 106,
+    "total": 791,
+    "n": 10,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "heap final do renderer < 700MB",
+    "ok": true,
+    "heap": 202
+  },
+  {
+    "name": "Sem erros de JavaScript",
+    "ok": true
+  }
+]

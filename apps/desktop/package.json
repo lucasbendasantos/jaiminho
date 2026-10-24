@@ -1,0 +1,38 @@
+{
+  "name": "jaiminho-desktop",
+  "productName": "Jaiminho",
+  "version": "0.1.0",
+  "description": "Jaiminho — cliente de API local e offline (HTTP/JSON, XML/SOAP, gRPC)",
+  "author": "Lucas Benda dos Santos",
+  "license": "Apache-2.0",
+  "repository": { "type": "git", "url": "git+https://github.com/lucasbendasantos/jaiminho.git" },
+  "main": "main/main.js",
+  "scripts": {
+    "build:ui": "vite build --config renderer/vite.config.mjs",
+    "dev": "npm run build:ui && electron .",
+    "start": "electron .",
+    "build": "npm run build:ui",
+    "dist:win": "npm run build:ui && electron-builder --win portable nsis --x64",
+    "dist:dir": "npm run build:ui && electron-builder --win dir --x64"
+  },
+  "dependencies": {
+    "@jaiminho/engine": "*",
+    "@jaiminho/mocks": "*"
+  },
+  "devDependencies": {
+    "@codemirror/lang-javascript": "6.2.4",
+    "@codemirror/lang-json": "6.0.1",
+    "@codemirror/lang-xml": "6.1.0",
+    "@codemirror/lang-yaml": "6.1.2",
+    "@fontsource/inter": "^5.2.6",
+    "@fontsource/jetbrains-mono": "^5.2.6",
+    "@playwright/test": "1.54.1",
+    "@uiw/react-codemirror": "4.23.12",
+    "@vitejs/plugin-react": "4.5.2",
+    "electron": "38.2.2",
+    "electron-builder": "26.0.12",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "vite": "6.3.5"
+  }
+}

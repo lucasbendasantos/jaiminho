@@ -1,0 +1,20 @@
+[
+  {
+    "area": "http",
+    "desc": "Cancelar /delay/8000 após 400 ms — sem systemProxy, rascunho",
+    "pass": false,
+    "evidence": "8347ms error=Cancelado"
+  },
+  {
+    "area": "http",
+    "desc": "Cancelar /delay/8000 após 400 ms — com systemProxy (como o app), rascunho",
+    "pass": false,
+    "evidence": "8289ms error=Cancelado"
+  },
+  {
+    "area": "http",
+    "desc": "Cancelar /delay/8000 após 400 ms — com systemProxy (como o app), request salva",
+    "pass": false,
+    "evidence": "8352ms error=Cancelado"
+  }
+]

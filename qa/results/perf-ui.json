@@ -1,0 +1,131 @@
+[
+  {
+    "name": "Abrir workspace com 3.000 requests (árvore aparece)",
+    "ok": true,
+    "wall": 1393,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "linhas no DOM=62",
+    "bad": []
+  },
+  {
+    "name": "Expandir uma pasta de 50 itens",
+    "ok": true,
+    "wall": 88,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Clicar numa request da árvore (seleção + abrir aba)",
+    "ok": true,
+    "wall": 39,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Recolher a pasta",
+    "ok": true,
+    "wall": 61,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Digitar no filtro da árvore (busca \"Req 59-4\")",
+    "ok": true,
+    "wall": 111,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "linhas filtradas=13",
+    "bad": []
+  },
+  {
+    "name": "Navegar na árvore com as setas (20 teclas)",
+    "ok": true,
+    "wall": 126,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "Resposta JSON de 2 MB: enviar e mostrar",
+    "ok": true,
+    "wall": 612,
+    "max": 102,
+    "total": 153,
+    "n": 2,
+    "extra": "200 OKentregue em 60 ms2.00 MB",
+    "bad": []
+  },
+  {
+    "name": "Corpo da resposta rola até o fim (não corta) e fica dentro da janela",
+    "ok": true,
+    "wall": 7,
+    "max": 101,
+    "total": 101,
+    "n": 1,
+    "extra": "altura visível=261px de 1606421px",
+    "bad": []
+  },
+  {
+    "name": "Resposta JSON de 20 MB: enviar e mostrar",
+    "ok": true,
+    "wall": 1956,
+    "max": 803,
+    "total": 905,
+    "n": 2,
+    "extra": "200 OKentregue em 433 ms20.00 MB",
+    "bad": []
+  },
+  {
+    "name": "Trocar de aba com a resposta de 20 MB aberta",
+    "ok": true,
+    "wall": 184,
+    "max": 0,
+    "total": 0,
+    "n": 0,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "gRPC server-streaming com 5.000 mensagens: invocar e mostrar",
+    "ok": true,
+    "wall": 3306,
+    "max": 164,
+    "total": 433,
+    "n": 6,
+    "extra": "OK (0)entregue em 1.25 s5000 mensagens",
+    "bad": []
+  },
+  {
+    "name": "Reenviar a mesma request 5 vezes seguidas (sem acumular lentidão)",
+    "ok": true,
+    "wall": 5178,
+    "max": 168,
+    "total": 1073,
+    "n": 12,
+    "extra": "",
+    "bad": []
+  },
+  {
+    "name": "heap final do renderer < 700MB",
+    "ok": true,
+    "heap": 242
+  },
+  {
+    "name": "Sem erros de JavaScript",
+    "ok": true
+  }
+]

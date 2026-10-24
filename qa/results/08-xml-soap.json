@@ -1,0 +1,62 @@
+[
+  {
+    "area": "xml",
+    "desc": "pretty() indenta XML e mantém texto; XML inválido volta igual",
+    "pass": true,
+    "evidence": "\"<a>\\n  <b>1</b>\\n  <c x=\\\"1\\\"/>\\n</a>\""
+  },
+  {
+    "area": "xml",
+    "desc": "pretty() preserva CDATA e comentários",
+    "pass": true,
+    "evidence": "\"<a>\\n  <![CDATA[<x> & y]]>\\n  <!-- nota -->\\n  <b>t</b>\\n</a>\""
+  },
+  {
+    "area": "xml",
+    "desc": "pretty() preserva texto misto e espaços significativos",
+    "pass": true,
+    "evidence": "\"<p>\\n  Olá\\n  <b>mundo</b>\\n  !\\n</p>\""
+  },
+  {
+    "area": "xml",
+    "desc": "XPath com prefixo do documento e local-name()",
+    "pass": true,
+    "evidence": "[[\"Ana\"],[\"Ana\"],1]"
+  },
+  {
+    "area": "xml",
+    "desc": "XPath com namespace PADRÃO (sem prefixo) — informativo",
+    "pass": true,
+    "evidence": "//n → [] ; local-name → [\"1\"]"
+  },
+  {
+    "area": "soap",
+    "desc": "Todas as operações do WSDL respondem 200 e validam no XSD (1.1 e 1.2)",
+    "pass": true,
+    "evidence": "[{\"n\":\"GetTraveller@1.1\",\"c\":200,\"ct\":\"text/xml; charset=utf-8\",\"v\":true,\"f\":false},{\"n\":\"CreateTraveller@1.1\",\"c\":200,\"ct\":\"text/xml; charset=utf-8\",\"v\":true,\"f\":false},{\"n\":\"GetTraveller@1.2\",\"c\":200,\"ct\":\"application/soap+xml; charset=utf-8; action=\\\"http://jaiminho.local/mock/traveller/GetTraveller\\\"\",\"v\":true,\"f\":false},{\"n\":\"CreateTraveller@1.2\",\"c\":200,\"ct\":\"application/soap+xml; charset=utf-8; action=\\\"http://jaiminho.local/mock/traveller/CreateTraveller\\\"\",\"v\":true,\"f\":false}]"
+  },
+  {
+    "area": "soap",
+    "desc": "Envelope inválido no XSD é apontado (request.valid=false com erro legível)",
+    "pass": true,
+    "evidence": "{\"request\":{\"valid\":false,\"errors\":[\"Schemas validity error : Element '{http://jaiminho.local/mock/traveller}idErrado': This element is not expected. Expected is ( {http://jaiminho.local/mock/traveller}id ).\"]}}"
+  },
+  {
+    "area": "soap",
+    "desc": "SOAP Fault detectado (código e mensagem)",
+    "pass": true,
+    "evidence": "{\"code\":500,\"fault\":{\"code\":\"soap:Client\",\"message\":\"Viajante 999999 não encontrado\"}}"
+  },
+  {
+    "area": "soap",
+    "desc": "SOAP 1.2: Content-Type application/soap+xml com action",
+    "pass": true,
+    "evidence": "application/soap+xml; charset=utf-8; action=\"http://jaiminho.local/mock/traveller/GetTraveller\""
+  },
+  {
+    "area": "soap",
+    "desc": "Request SOAP com {{variável}} no envelope",
+    "pass": true,
+    "evidence": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tns=\"http://jaiminho.local/mock/traveller\"><soap:Body><tns:GetTravellerResponse><tns:"
+  }
+]

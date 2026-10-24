@@ -1,0 +1,188 @@
+[
+  {
+    "area": "tls",
+    "desc": "HTTPS com CA desconhecida falha com mensagem clara",
+    "pass": true,
+    "evidence": "Não foi possível verificar o certificado do servidor (CA desconhecida): adicione a CA ou desligue a verificação SSL [UNABLE_TO_VERIFY_LEAF_SIGNATURE]"
+  },
+  {
+    "area": "tls",
+    "desc": "SSL off global (workspace) aceita",
+    "pass": true,
+    "evidence": 200
+  },
+  {
+    "area": "tls",
+    "desc": "SSL off por request aceita (global ligado)",
+    "pass": true,
+    "evidence": 200
+  },
+  {
+    "area": "tls",
+    "desc": "SSL ON por request vence SSL off global",
+    "pass": true,
+    "evidence": "Não foi possível verificar o certificado do servidor (CA desconhecida): adicione a CA ou desligue a verificação SSL [UNABLE_TO_VERIFY_LEAF_SIGNATURE]"
+  },
+  {
+    "area": "tls",
+    "desc": "CA própria do workspace (caminho absoluto)",
+    "pass": true,
+    "evidence": 200
+  },
+  {
+    "area": "tls",
+    "desc": "CA própria com caminho RELATIVO ao workspace (partilhável)",
+    "pass": true,
+    "evidence": 200
+  },
+  {
+    "area": "tls",
+    "desc": "CA errada continua falhando",
+    "pass": true,
+    "evidence": "Não foi possível verificar o certificado do servidor (CA desconhecida): adicione a CA ou desligue a verificação SSL [UNABLE_TO_VERIFY_LEAF_SIGNATURE]"
+  },
+  {
+    "area": "tls",
+    "desc": "Host não bate com certificado (127.0.0.1 está no SAN; usa 127.0.0.2? informativo)",
+    "pass": true,
+    "evidence": "127.0.0.1 (no SAN) ok=true "
+  },
+  {
+    "area": "tls",
+    "desc": "CA do workspace com caminho inexistente: avisa (não silencia)",
+    "pass": true,
+    "evidence": "ok=false error=Não foi possível verificar o certificado do servidor (CA desconhecida): adicione a CA ou desligue a verificação SSL [UNABLE_TO_VERIFY_LEAF_SIGNATURE] — CA configurada não encontrada: nao/existe.crt (Configurações → Certificados)"
+  },
+  {
+    "area": "mtls",
+    "desc": "Sem certificado de cliente → mensagem pede mTLS",
+    "pass": true,
+    "evidence": "O servidor exige certificado de cliente (mTLS): configure em Configurações → Certificados [ERR_SSL_TLSV13_ALERT_CERTIFICATE_REQUIRED]"
+  },
+  {
+    "area": "mtls",
+    "desc": "mTLS PEM com host:porta",
+    "pass": true,
+    "evidence": "jaiminho-client"
+  },
+  {
+    "area": "mtls",
+    "desc": "mTLS PEM com host SEM porta (como no Postman, vale p/ qualquer porta?)",
+    "pass": true,
+    "evidence": "jaiminho-client"
+  },
+  {
+    "area": "mtls",
+    "desc": "mTLS com wildcard \"*.localhost\"/\"*\" no host",
+    "pass": true,
+    "evidence": "jaiminho-client"
+  },
+  {
+    "area": "mtls",
+    "desc": "mTLS P12 com senha certa (segredo)",
+    "pass": true,
+    "evidence": "jaiminho-client"
+  },
+  {
+    "area": "mtls",
+    "desc": "mTLS P12 com senha ERRADA → mensagem clara de senha",
+    "pass": true,
+    "evidence": "ok=false error=mac verify failure errors=[]"
+  },
+  {
+    "area": "mtls",
+    "desc": "Certificado configurado para OUTRO host não é usado",
+    "pass": true,
+    "evidence": "O servidor exige certificado de cliente (mTLS): configure em Configurações → Certificados [ERR_SSL_TLSV13_ALERT_CERTIFICATE_REQUIRED]"
+  },
+  {
+    "area": "mtls",
+    "desc": "Cliente assinado por CA não confiável → recusado com mensagem",
+    "pass": "Conexão encerrada pelo servidor [ECONNRESET]",
+    "evidence": "Conexão encerrada pelo servidor [ECONNRESET]"
+  },
+  {
+    "area": "mtls",
+    "desc": "mTLS com arquivo de chave inexistente → erro claro",
+    "pass": true,
+    "evidence": "ok=false error=Arquivo do certificado de cliente não encontrado (key): /nao/existe.key. Verifique em Configurações → Certificados. errors=[]"
+  },
+  {
+    "area": "mtls",
+    "desc": "mTLS com caminhos RELATIVOS ao workspace",
+    "pass": true,
+    "evidence": "jaiminho-client"
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "grpcs:// com CA desconhecida → erro claro",
+    "pass": true,
+    "evidence": "UNAVAILABLE: certificado do servidor não é confiável: adicione a CA em Configurações → Certificados ou desligue a verificação SSL (14 UNAVAILABLE: No connection established. Last error: Error: unable to verify the first certificate. Resolution note: )"
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "grpcs:// com SSL off (workspace)",
+    "pass": true
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "grpcs:// com SSL off por request (tls.verifySsl=false)",
+    "pass": true
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "grpcs:// com CA própria",
+    "pass": true
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "grpcs:// para 127.0.0.1 (IP no SAN) com CA própria",
+    "pass": true
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "Plaintext contra servidor TLS → mensagem \"TLS/plaintext trocados\"",
+    "pass": true,
+    "evidence": "UNAVAILABLE: não foi possível conectar. Verifique host/porta; se o servidor usa TLS, use grpcs:// (ou ligue o cadeado) (14 UNAVAILABLE: No connection established. Last error: Failed to connect (2026-10-24T10:13:51.884Z). Resolution note: )"
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "TLS contra servidor plaintext → mensagem \"TLS/plaintext trocados\"",
+    "pass": true,
+    "evidence": "UNAVAILABLE: não foi possível conectar. Verifique host/porta; se o servidor é plaintext, use grpc:// (ou desligue o cadeado) (14 UNAVAILABLE: No connection established. Last error: Error: C0EC70DC857F0000:error:0A00010B:SSL routines:tls_validate_record_header:wrong version number:../deps/openssl/openssl/ssl/record/methods/tlsany_meth.c:84:\n. Resolution note: )"
+  },
+  {
+    "area": "grpc-mtls",
+    "desc": "mTLS gRPC PEM",
+    "pass": "localhost:39123",
+    "evidence": "localhost:39123"
+  },
+  {
+    "area": "grpc-mtls",
+    "desc": "mTLS gRPC P12 senha certa",
+    "pass": true
+  },
+  {
+    "area": "grpc-mtls",
+    "desc": "mTLS gRPC P12 senha ERRADA → erro claro de senha",
+    "pass": true,
+    "evidence": "PKCS#12 MAC could not be verified. Invalid password?"
+  },
+  {
+    "area": "grpc-mtls",
+    "desc": "mTLS gRPC sem certificado → mensagem pede mTLS",
+    "pass": true,
+    "evidence": "UNAVAILABLE: o servidor exige certificado de cliente (mTLS): configure em Configurações → Certificados (14 UNAVAILABLE: No connection established. Last error: C0EC70DC857F0000:error:0A00045C:SSL routines:ssl3_read_bytes:tlsv13 alert certificate required:../deps/openssl/openssl/ssl/record/rec_layer_s3.c:916:SSL alert number 116\n (2026-10-24T10:13:52.159Z). Resolution note: )"
+  },
+  {
+    "area": "grpc-mtls",
+    "desc": "mTLS gRPC: trocar o certificado do workspace (sem reiniciar) passa a valer (cache de reflection)",
+    "pass": true
+  },
+  {
+    "area": "grpc-tls",
+    "desc": "Cache de reflection: após conectar com SSL off, religar verificação deve voltar a falhar",
+    "pass": true,
+    "evidence": "1º ok=true; 2º (verificação ligada, CA desconhecida) ok=false UNAVAILABLE: certificado do servidor não é confiável: adicione a CA em Configurações → Certificados ou desligue a verificação SSL (No connection established. Last error: Error: unable to verify the first certificate. Resolution note: )"
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "name": "@jaiminho/engine",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 test/*.test.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.0",
+    "@grpc/proto-loader": "^0.8.0",
+    "@xmldom/xmldom": "^0.9.8",
+    "chai": "^4.5.0",
+    "curl-to-postmanv2": "^1.8.7",
+    "fast-xml-parser": "^5.3.0",
+    "grpc-js-reflection-client": "^1.4.3",
+    "jszip": "^3.10.1",
+    "node-forge": "^1.4.0",
+    "openapi-to-postmanv2": "^6.4.1",
+    "postman-code-generators": "^2.1.1",
+    "postman-collection": "^5.3.1",
+    "postman-runtime": "^7.56.3",
+    "protobufjs": "^7.5.4",
+    "xmllint-wasm": "^5.3.0",
+    "xpath": "^0.0.34",
+    "yaml": "^2.8.1"
+  }
+}

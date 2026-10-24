@@ -1,0 +1,7 @@
+Jaiminho
+Copyright 2026 Lucas Benda dos Santos
+
+Este produto usa bibliotecas open source de terceiros (entre elas postman-runtime,
+postman-collection, postman-sandbox, openapi-to-postmanv2, postman-code-generators,
+@grpc/grpc-js, protobufjs, Electron, React e CodeMirror), cada uma sob a sua própria licença.
+A arte do mascote em branding/ não é coberta pela licença Apache-2.0 (ver README).

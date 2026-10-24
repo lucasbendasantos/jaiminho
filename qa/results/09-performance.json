@@ -1,0 +1,98 @@
+[
+  {
+    "area": "perf",
+    "desc": "Workspace com 3.000 requests em 60 pastas: criar, abrir, montar a árvore e resolver a cadeia",
+    "pass": true,
+    "evidence": "requests=3000 criar=671ms abrir=596ms árvore=629ms 200×chain=48ms"
+  },
+  {
+    "area": "perf",
+    "desc": "Árvore e abertura escalam (10.000 requests) sem ficar quadráticas",
+    "pass": true,
+    "evidence": "10.000 requests: abrir=1324ms árvore=1143ms (100 pastas)"
+  },
+  {
+    "area": "perf",
+    "desc": "Import de Swagger com 1.500 endpoints termina rápido e gera tudo",
+    "pass": true,
+    "evidence": "4637ms, itens=3000, maior travamento do event loop=0ms"
+  },
+  {
+    "area": "perf",
+    "desc": "Resposta JSON de 20 MB: chega inteira, em poucos segundos e sem travar o event loop",
+    "pass": true,
+    "evidence": "ok=true corpo=20.0MB tempo=393ms travamento=196ms "
+  },
+  {
+    "area": "perf",
+    "desc": "Resposta de 20 MB: serializar para o IPC (JSON) cabe no orçamento e o tamanho é conhecido",
+    "pass": true,
+    "evidence": "serializar+ler=142ms (21.4MB)"
+  },
+  {
+    "area": "perf",
+    "desc": "300 requests em sequência: latência média baixa e memória estável (sem vazamento)",
+    "pass": true,
+    "evidence": "24.0ms/request, heap +0.3MB"
+  },
+  {
+    "area": "perf",
+    "desc": "50 requests em paralelo completam sem erro",
+    "pass": true,
+    "evidence": "494ms, falhas=0"
+  },
+  {
+    "area": "perf",
+    "desc": "Histórico com 2.000 itens: listar os 300 mais novos é rápido",
+    "pass": true,
+    "evidence": "5ms, arquivos=2000"
+  },
+  {
+    "area": "perf",
+    "desc": "Variáveis efetivas com 2.000 variáveis resolvem rápido",
+    "pass": true,
+    "evidence": "169ms ok=true"
+  },
+  {
+    "area": "perf-grpc",
+    "desc": "Server-streaming com 5.000 mensagens: recebe todas, rápido, sem travar",
+    "pass": true,
+    "evidence": "msgs=5000 tempo=546ms eventos=5005 travamento=16ms "
+  },
+  {
+    "area": "perf-grpc",
+    "desc": "50 chamadas gRPC unárias em sequência reaproveitam o schema (cache) e são rápidas",
+    "pass": true,
+    "evidence": "3.0ms/chamada"
+  },
+  {
+    "area": "perf",
+    "desc": "Runner: 200 iterações de uma request com CSV grande terminam e reportam",
+    "pass": true,
+    "evidence": "5122ms, resultado=33KB "
+  },
+  {
+    "area": "perf-pool",
+    "desc": "30 requests com script em paralelo: cada uma vê só os próprios console/testes/variáveis",
+    "pass": true,
+    "evidence": "ok"
+  },
+  {
+    "area": "perf-pool",
+    "desc": "Variável global criada num script NÃO vaza para o script de outra request",
+    "pass": true,
+    "evidence": "[{\"name\":\"limpo\",\"passed\":true,\"skipped\":false}]"
+  },
+  {
+    "area": "perf-pool",
+    "desc": "Script em loop infinito estoura o tempo, não trava o app e a próxima request com script funciona",
+    "pass": true,
+    "evidence": "loop=10535ms erros=[\"Script de teste: sandbox not responding\"] depois: [{\"name\":\"vivo\",\"passed\":true,\"skipped\":false}]"
+  },
+  {
+    "area": "perf-pool",
+    "desc": "Cancelar durante o envio com script e continuar usando o app (contexto descartado)",
+    "pass": true,
+    "evidence": "Cancelado / [{\"name\":\"depois\",\"passed\":true,\"skipped\":false}]"
+  }
+]

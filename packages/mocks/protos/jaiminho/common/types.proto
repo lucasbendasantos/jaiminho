@@ -1,0 +1,17 @@
+syntax = "proto3";
+package jaiminho.common;
+
+import "google/protobuf/timestamp.proto";
+
+enum DocumentType {
+  DOCUMENT_TYPE_UNSPECIFIED = 0;
+  PASSPORT = 1;
+  ID_CARD = 2;
+}
+
+message Document {
+  DocumentType type = 1;
+  string number = 2;
+  string issuing_country = 3;
+  google.protobuf.Timestamp expires_at = 4;
+}

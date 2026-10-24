@@ -1,0 +1,61 @@
+syntax = "proto3";
+package jaiminho.mock.v1;
+
+import "google/protobuf/timestamp.proto";
+import "jaiminho/common/types.proto";
+
+// Serviço de viajantes usado nos testes do Jaiminho.
+service TravellerService {
+  rpc GetTraveller (GetTravellerRequest) returns (Traveller);
+  rpc ListTravellers (ListTravellersRequest) returns (stream Traveller);
+  rpc UploadTravellers (stream Traveller) returns (UploadSummary);
+  rpc Chat (stream ChatMessage) returns (stream ChatMessage);
+  rpc Fail (FailRequest) returns (Traveller);
+  rpc Slow (SlowRequest) returns (Traveller);
+  rpc Whoami (WhoamiRequest) returns (WhoamiReply);
+}
+
+message GetTravellerRequest { string id = 1; }
+
+message ListTravellersRequest {
+  int32 limit = 1;
+  string nationality = 2;
+}
+
+message Traveller {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string nationality = 4;
+  repeated jaiminho.common.Document documents = 5;
+  map<string, string> tags = 6;
+  google.protobuf.Timestamp created_at = 7;
+  oneof contact {
+    string email = 8;
+    string phone = 9;
+  }
+}
+
+message UploadSummary {
+  int32 received = 1;
+  repeated string ids = 2;
+}
+
+message ChatMessage {
+  string from = 1;
+  string text = 2;
+  int32 seq = 3;
+}
+
+message FailRequest {
+  int32 code = 1;
+  string message = 2;
+}
+
+message SlowRequest { int32 delay_ms = 1; }
+
+message WhoamiRequest {}
+message WhoamiReply {
+  string user = 1;
+  map<string, string> metadata = 2;
+}

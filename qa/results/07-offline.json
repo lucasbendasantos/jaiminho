@@ -1,0 +1,20 @@
+[
+  {
+    "area": "offline",
+    "desc": "Nenhuma conexão/DNS para fora de localhost durante envio HTTP/SOAP/gRPC, imports (Swagger/WSDL/cURL), XSD, codegen, bundle",
+    "pass": true,
+    "evidence": "só local (2 destinos distintos)"
+  },
+  {
+    "area": "offline",
+    "desc": "Swagger com $ref remoto (http) NÃO é buscado na internet (informativo: como fica o body)",
+    "pass": true,
+    "evidence": "não buscou"
+  },
+  {
+    "area": "offline",
+    "desc": "Dependências do app/motor sem telemetria conhecida (grep em node_modules de pacotes de runtime)",
+    "pass": true,
+    "evidence": "nenhum pacote de telemetria/auto-update instalado"
+  }
+]

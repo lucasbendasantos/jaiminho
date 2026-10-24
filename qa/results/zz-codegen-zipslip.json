@@ -1,0 +1,14 @@
+[
+  {
+    "area": "curl",
+    "desc": "Codegen (Python/Node/cURL) de body JSON inclui Content-Type: application/json",
+    "pass": true,
+    "evidence": "{\"curl\":true,\"python\":true,\"nodejs\":true}"
+  },
+  {
+    "area": "bundle",
+    "desc": "SEGURANÇA (Windows): entrada de zip com \"..\\\\..\\\\\" passa pelo JSZip e o destino resolvido sai do workspace",
+    "pass": true,
+    "evidence": "preview.problems=[\"caminho inseguro (sai do workspace): ..\\\\..\\\\..\\\\Users\\\\Public\\\\pwned.txt\",\"caminho inseguro no zip: ..\\\\..\\\\..\\\\Users\\\\Public\\\\pwned.txt\"] import erro=Bundle corrompido: caminho inseguro (sai do workspace): ..\\..\\..\\Users\\Public\\pwned.txt; caminho inseguro no zip: ..\\..\\..\\Users\\Public\\pwned.txt; no Linux gravou arquivo literal []; no Windows path.join(ws, entrada) = C:\\Users\\Users\\Public\\pwned.txt (fora do workspace C:\\Users\\lucas\\Jaiminho\\meu-ws)"
+  }
+]

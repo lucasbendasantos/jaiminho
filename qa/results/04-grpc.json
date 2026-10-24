@@ -1,0 +1,315 @@
+[
+  {
+    "area": "grpc",
+    "desc": "Unário via reflection",
+    "pass": true,
+    "evidence": "{\"id\":\"1\",\"first_name\":\"Jaime\",\"last_name\":\"Palillo\",\"nationality\":\"MX\",\"documents\":[{\"type\":\"PASSPORT\",\"number\":\"P123\",\"issuing_country\":\"MX\",\"expire"
+  },
+  {
+    "area": "grpc",
+    "desc": "URL sem esquema (127.0.0.1:porta) = plaintext",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": "URL \"localhost:porta\" sem esquema",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": "URL com barra final \"grpc://host:porta/\"",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": "URL no formato \"dns:///host:porta\" (documentado em parseTarget)",
+    "pass": true,
+    "evidence": "parseTarget={\"target\":\"localhost:33231\",\"tls\":false,\"host\":\"localhost\",\"port\":33231} error=undefined"
+  },
+  {
+    "area": "grpc",
+    "desc": "URL IPv6 \"[::1]:porta\"",
+    "pass": true,
+    "evidence": "parseTarget={\"target\":\"[::1]:33231\",\"tls\":false,\"host\":\"::1\",\"port\":33231}"
+  },
+  {
+    "area": "grpc",
+    "desc": "URL com espaço sobrando e {{var}} de ambiente",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": ".proto com import (pasta do proto como import path)",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": ".proto com import SEM import path explícito (import relativo à raiz)",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": ".proto copiado sozinho (sem os imports): erro CLARO que aponta o arquivo faltante e o caminho de correção",
+    "pass": true,
+    "evidence": "Import não encontrado: \"jaiminho/common/types.proto\". Adicione esse arquivo (ou a pasta raiz dos .proto) em Schema → Import paths, ou use \"+ Adicionar .proto\" que copia os imports junto."
+  },
+  {
+    "area": "grpc",
+    "desc": "\"+ Adicionar .proto\" (addProtoToWorkspace) copia o arquivo COM os imports e a chamada funciona",
+    "pass": true,
+    "evidence": "protos/jaiminho/mock/v1/traveller.proto, protos/jaiminho/common/types.proto :: ok"
+  },
+  {
+    "area": "grpc",
+    "desc": ".proto com caminho relativo ao workspace + import path relativo",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": "Protoset congelado a partir da reflection e usado contra servidor sem reflection",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": "Protoset a partir de .proto (toProtoset de schema root) funciona",
+    "pass": true
+  },
+  {
+    "area": "grpc",
+    "desc": "Servidor sem reflection → erro claro sugerindo .proto/protoset",
+    "pass": true,
+    "evidence": "UNIMPLEMENTED (12): 12 UNIMPLEMENTED: The server does not implement the method /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo"
+  },
+  {
+    "area": "grpc",
+    "desc": "Servidor desligado → UNAVAILABLE conexão recusada (rápido)",
+    "pass": true,
+    "evidence": "5ms UNAVAILABLE: conexão recusada (servidor desligado ou porta errada) (14 UNAVAILABLE: No connection established. Last error: Error: connect ECONNREFUSED 127.0.0.1:1. Resolution note: )"
+  },
+  {
+    "area": "grpc",
+    "desc": "Server streaming completo e ordem",
+    "pass": true,
+    "evidence": "2 msgs "
+  },
+  {
+    "area": "grpc",
+    "desc": "Client streaming com escrita via handle e end()",
+    "pass": true,
+    "evidence": "[{\"received\":2,\"ids\":[\"x1\",\"x2\"]}]"
+  },
+  {
+    "area": "grpc",
+    "desc": "Bidi: cancelar no meio",
+    "pass": true,
+    "evidence": "CANCELLED msgs=1"
+  },
+  {
+    "area": "grpc",
+    "desc": "Unário: cancelar antes da resposta (Slow)",
+    "pass": true,
+    "evidence": "301ms CANCELLED"
+  },
+  {
+    "area": "grpc",
+    "desc": "Cancelar IMEDIATAMENTE (antes da reflection terminar)",
+    "pass": true,
+    "evidence": "7ms status=CANCELLED error=CANCELLED (1): Cancelled on client"
+  },
+  {
+    "area": "grpc",
+    "desc": "Deadline padrão de streaming = sem deadline; deadline unário custom",
+    "pass": true,
+    "evidence": "DEADLINE_EXCEEDED (4): Deadline exceeded after 0.101s,name resolution: 0.001s,LB pick: 0.001s,remote_addr=127.0.0.1:33231"
+  },
+  {
+    "area": "grpc",
+    "desc": "Metadata -bin (base64) chega como binário no servidor",
+    "pass": true,
+    "evidence": "{\"authorization\":\"Bearer jaiminho-token\",\"x-dado-bin\":\"AQID+g==\",\"x-maiusc\":\"v\",\"user-agent\":\"Jaiminho/0.1 grpc-node-js/1.14.6\",\"peer\":\"127.0.0.1:59196\"}"
+  },
+  {
+    "area": "grpc",
+    "desc": "Metadata com valor não-ASCII (acento) → erro claro em vez de crash",
+    "pass": true,
+    "evidence": "ok=false Metadata string value \"João\" contains illegal characters"
+  },
+  {
+    "area": "grpc",
+    "desc": "Whoami sem token → UNAUTHENTICATED",
+    "pass": true,
+    "evidence": "UNAUTHENTICATED (16): token ausente ou inválido"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "JSON malformado → erro claro",
+    "pass": true,
+    "evidence": "ok=false error=Unexpected end of JSON input enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Campo inexistente",
+    "pass": true,
+    "evidence": "ok=false error=$.nope: campo não existe em GetTravellerRequest. Campos válidos: id enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Tipo errado: string \"abc\" em campo int32 (limit) deve ser rejeitado",
+    "pass": true,
+    "evidence": "ok=false error=$.limit: esperado inteiro (int32), veio \"abc\" enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Tipo errado: objeto em campo string (id) deve ser rejeitado",
+    "pass": true,
+    "evidence": "ok=false error=$.id: esperado texto (string), veio objeto {\"a\":1} enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Tipo errado: número em campo string (id) (proto3 JSON rejeita)",
+    "pass": true,
+    "evidence": "ok=false error=$.id: esperado texto (string), veio number 123 enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Lista em campo não repetido",
+    "pass": true,
+    "evidence": "ok=false error=$.id: campo não é repeated: não aceita lista enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Enum inválido em documents[].type",
+    "pass": true,
+    "evidence": "ok=false error=Mensagem inválida: $.documents[0].type: valor de enum inválido \"XPTO\". Válidos: DOCUMENT_TYPE_UNSPECIFIED, PASSPORT, ID_CARD enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Timestamp inválido",
+    "pass": true,
+    "evidence": "ok=false error=Mensagem inválida: $.created_at: Timestamp inválido (use RFC 3339, ex.: 2026-01-01T10:00:00Z): \"ontem\" enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "oneof com 2 campos (email e phone) deve ser rejeitado",
+    "pass": true,
+    "evidence": "ok=false error=Mensagem inválida: $.email: \"email\" e \"phone\" fazem parte do mesmo oneof \"contact\": envie só um enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "int32 fora do intervalo (limit=99999999999) deve ser rejeitado",
+    "pass": true,
+    "evidence": "ok=false error=$.limit: 99999999999 fora do intervalo de int32 (-2147483648..2147483647) enviado=-"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Mensagem vazia \"\" vira {} e é ENVIADA (o servidor decide: NOT_FOUND por id vazio)",
+    "pass": true,
+    "evidence": "enviado={} erro=NOT_FOUND (5): viajante  não encontrado"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Map, repeated e Timestamp com offset/frações enviados corretamente (Upload ecoa ids)",
+    "pass": true,
+    "evidence": "{\"id\":\"m1\",\"documents\":[{\"type\":\"PASSPORT\",\"number\":\"N\"}],\"tags\":{\"a\":\"1\",\"chave com espaço\":\"ç\"},\"created_at\":\"2026-01-01T08:00:00.123456789Z\"}"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Nomes camelCase (firstName) aceitos como no JSON do proto3",
+    "pass": true
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "{{$randomInt}} na mensagem: o que é mostrado como enviado == o que o servidor recebeu",
+    "pass": true,
+    "evidence": "mostrado=558 servidor recebeu=558"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Resposta de erro com status details decodificado",
+    "pass": true,
+    "evidence": "{\"code\":9,\"name\":\"FAILED_PRECONDITION\",\"details\":\"pré-condição\",\"errorDetails\":{\"code\":9,\"message\":\"pré-condição\",\"details\":[{\"@type\":\"type.googleapis.com/google.rpc.BadRequest\",\"field_violations\":[{\"field\":\"id\",\"description\":\"id precisa ser numérico\"}]},{\"@type\":\"type.googleapis.com/google.rpc.ErrorInfo\",\"reason\":\"MOCK_FAILURE\",\"domain\":\"jaiminho.local\",\"metadata\":{\"tentativa\":\"1\"}}]}}"
+  },
+  {
+    "area": "grpc-msg",
+    "desc": "Exemplo gerado (sample) é aceito pelo próprio método",
+    "pass": true,
+    "evidence": "{\"id\":\"1\",\"first_name\":\"Jaime\",\"last_name\":\"Palillo\",\"nationality\":\"PT\",\"documents\":[{\"type\":\"PASSPORT\",\"number\":\"texto\",\"issuing_country\":\"PT\",\"expires_at\":\"2026-10-24T10:13:54Z\"}],\"tags\":{\"chave\":\"texto\"},\"created_at\":\"2026-10-24T10:13:54Z\",\"email\":\"jaiminho@correio.mx\"} :: ok"
+  },
+  {
+    "area": "grpc-script",
+    "desc": "beforeInvoke altera variável usada na mensagem e onIncomingMessage roda por mensagem",
+    "pass": true,
+    "evidence": " msgs=3 tests=3"
+  },
+  {
+    "area": "grpc-script",
+    "desc": "Erro de sintaxe no beforeInvoke → erro claro, sem crash",
+    "pass": true,
+    "evidence": "Script beforeInvoke: Unexpected token '}'"
+  },
+  {
+    "area": "grpc-script",
+    "desc": "Loop infinito no afterResponse é interrompido (timeout)",
+    "pass": true,
+    "evidence": "10019ms console=[{\"level\":\"error\",\"args\":[\"Erro no script: Script execution timed out after 10000ms\"]}]"
+  },
+  {
+    "area": "grpc-script",
+    "desc": "pm.environment.set no afterResponse de variável NOVA disponível na próxima request",
+    "pass": true,
+    "evidence": "id enviado=Jaime"
+  },
+  {
+    "area": "grpc-script",
+    "desc": "pm.sendRequest disponível em script gRPC (Postman tem)",
+    "pass": true,
+    "evidence": "[{\"name\":\"sendRequest existe\",\"passed\":true}]"
+  },
+  {
+    "area": "grpc-script",
+    "desc": "pm.test assíncrono que FALHA não pode aparecer como aprovado",
+    "pass": true,
+    "evidence": "[{\"name\":\"async falha\",\"passed\":false,\"error\":\"falhou\"}]"
+  },
+  {
+    "area": "grpc-script",
+    "desc": "SEGURANÇA: script gRPC de coleção partilhada não escapa do sandbox (acesso a process/require)",
+    "pass": true,
+    "evidence": "bloqueado: [{\"level\":\"error\",\"args\":[\"Erro no script: EvalError: Code generation from strings disallowed for this context\"]}]"
+  },
+  {
+    "area": "scripts",
+    "desc": "SEGURANÇA (comparação): script HTTP (postman-sandbox) também não escapa",
+    "pass": true,
+    "evidence": "[{\"level\":\"log\",\"args\":[\"bloqueado\",\"process is not defined\"]}]"
+  },
+  {
+    "area": "grpc-runner",
+    "desc": "Runner com requests gRPC + HTTP",
+    "pass": true,
+    "evidence": "{\"requests\":8,\"failed\":0,\"tests\":2,\"testsFailed\":0} GetTraveller:OK,ListTravellers:OK,UploadTravellers:OK,http:200,GetTraveller:OK,ListTravellers:OK,UploadTravellers:OK,http:200"
+  },
+  {
+    "area": "grpc",
+    "desc": "describe com {{var}} na URL sem ambiente → erro claro (não \"NaN\")",
+    "pass": true,
+    "evidence": "Variável não definida no endereço: {{host}}. Selecione um ambiente ou crie a variável."
+  },
+  {
+    "area": "grpcurl",
+    "desc": "Export grpcurl → import grpcurl preserva método, metadata, mensagem e TLS",
+    "pass": true,
+    "evidence": "{\"bash\":{\"cmd\":\"grpcurl \\\\\\n  -insecure \\\\\\n  -H 'authorization: Bearer x' \\\\\\n  -d '{\\\"id\\\":\\\"1\\\",\\\"nome\\\":\\\"it'\\\\''s\\\"}' localhost:33231 jaiminho.mock.v1.TravellerService/GetTraveller\",\"ok\":true},\"cmd\":{\"cmd\":\"grpcurl ^\\n  -insecure ^\\n  -H \\\"authorization: Bearer x\\\" ^\\n  -d \\\"{\\\\\\\"id\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"nome\\\\\\\":\\\\\\\"it's\\\\\\\"}\\\" localhost:33231 jaiminho.mock.v1.TravellerService/GetTraveller\",\"ok\":true},\"powershell\":{\"cmd\":\"grpcurl.exe `\\n  -insecure `\\n  -H \\\"authorization: Bearer x\\\" `\\n  -d \\\"{`\\\"id`\\\":`\\\"1`\\\",`\\\"nome`\\\":`\\\"it's`\\\"}\\\" localhost:33231 jaiminho.mock.v1.TravellerService/GetTraveller\",\"ok\":true}}"
+  },
+  {
+    "area": "grpcurl",
+    "desc": "Import grpcurl real com -d @ (stdin) e -H múltiplos e método com ponto",
+    "pass": true,
+    "evidence": "{\"m\":\"jaiminho.mock.v1.TravellerService/GetTraveller\",\"url\":\"grpc://localhost:33231\",\"md\":[{\"key\":\"a\",\"value\":\"1\"},{\"key\":\"b\",\"value\":\"2\"}]}"
+  },
+  {
+    "area": "grpcurl",
+    "desc": "importAuto com grpcurl cria request e ela funciona",
+    "pass": true
+  }
+]

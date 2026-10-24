@@ -1,0 +1,14 @@
+{
+  "name": "jaiminho",
+  "private": true,
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "test": "npm test -w packages/engine",
+    "mocks": "node packages/mocks/src/start.js",
+    "dev": "npm run dev -w apps/desktop",
+    "build": "npm run build -w apps/desktop",
+    "dist:win": "npm run dist:win -w apps/desktop"
+  }
+}

@@ -1,0 +1,188 @@
+[
+  {
+    "area": "workspace",
+    "desc": "Nomes com acento e caracteres proibidos no Windows (: * ? \" < > |) geram arquivos válidos e o nome original é preservado",
+    "pass": true,
+    "evidence": "inválidos no Windows: []; nomes relidos ok=true; arquivos=010-acao-teste.req.yaml, 020-a-b-c-d-e.req.yaml, 030-con-_.req.yaml, 040-nul-_.req.yaml, 050-aux-txt.req.yaml, 060-pasta.req.yaml, 070-trailing-space.req.yaml, 080-sem-nome.req.yaml, 090-sem-nome.req.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Coleção com nome reservado do Windows (\"CON\", \"Aux\") vira pasta válida",
+    "pass": true,
+    "evidence": "[\"con-_\",\"aux-_\"]"
+  },
+  {
+    "area": "workspace",
+    "desc": "Nomes iguais na mesma pasta não se sobrescrevem",
+    "pass": true,
+    "evidence": "a,b"
+  },
+  {
+    "area": "workspace",
+    "desc": "Renomear request para o MESMO nome de uma irmã (colisão) mantém as duas",
+    "pass": true,
+    "evidence": "010-a.req.yaml,020-a.req.yaml,_collection.yaml,jaiminho.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Renomear pasta e request: arquivos acompanham e nada se perde ao reabrir",
+    "pass": true,
+    "evidence": "collections/c/010-pasta-nova/010-req-nova.req.yaml, collections/c/010-pasta-nova/_folder.yaml, collections/c/_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Request com body grande (>4KB) vai para arquivo irmão e volta ao ler",
+    "pass": true,
+    "evidence": "010-grande.body.xml,010-grande.req.yaml,_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Renomear request com body grande leva o arquivo do body junto",
+    "pass": true,
+    "evidence": "010-dois.body.json,010-dois.req.yaml,_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Body grande que encolhe (<4KB) remove o arquivo irmão",
+    "pass": true,
+    "evidence": "010-x.req.yaml,_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Trocar a linguagem do body grande (json→xml) não deixa arquivo órfão nem body errado",
+    "pass": true,
+    "evidence": "010-x.body.xml,010-x.req.yaml,_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Mover request para outra pasta e reordenar (inclui request com body grande)",
+    "pass": true,
+    "evidence": "collections/c/010-f1/020-b.req.yaml, collections/c/010-f1/_folder.yaml, collections/c/020-f2/010-a.body.json, collections/c/020-f2/010-a.req.yaml, collections/c/020-f2/020-c.req.yaml, collections/c/020-f2/_folder.yaml, collections/c/_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Reordenar dentro da MESMA pasta: trocar posições de requests com body grande (renumeração com colisão)",
+    "pass": true,
+    "evidence": "ordem=[\"tres\",\"dois\",\"um\"] bodies ok=true arquivos=010-tres.body.json,010-tres.req.yaml,020-dois.body.json,020-dois.req.yaml,030-um.body.json,030-um.req.yaml,_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Reordenar pastas irmãs com nomes iguais",
+    "pass": true,
+    "evidence": "[\"r2\",\"r0\",\"r1\"] 010-mesma,020-mesma,030-mesma,_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Mover pasta para dentro dela mesma é recusado",
+    "pass": true,
+    "evidence": "Não dá para mover uma pasta para dentro dela mesma"
+  },
+  {
+    "area": "workspace",
+    "desc": "Mover request para outra COLEÇÃO",
+    "pass": true,
+    "evidence": "{\"type\":\"request\",\"file\":\"/tmp/jaiminho-qa-98cH5J/collections/c2/010-r.req.yaml\",\"parentId\":\"01a16d67-5636-7169-a372-8012c839c69e\",\"collectionId\":\"01a16d67-5636-7169-a372-8012c839c69e\"}"
+  },
+  {
+    "area": "workspace",
+    "desc": "Duplicar request, pasta (com filhos) e coleção",
+    "pass": true,
+    "evidence": "ok=true _folder.yaml duplicado:\nvars:\n  - key: v\n    value: \"1\"\nname: F (cópia)\nid: 01a16d67-5642-7eb5-81bc-342cd98a88b1\n"
+  },
+  {
+    "area": "workspace",
+    "desc": "Duplicar coleção com variável SEGREDO mantém o segredo na cópia",
+    "pass": true,
+    "evidence": "cópia: [{\"key\":\"s\",\"value\":\"S1\",\"secret\":true,\"source\":\"secret\"}] missingSecrets=[]"
+  },
+  {
+    "area": "workspace",
+    "desc": "Duplicar ambiente com segredo mantém o segredo na cópia",
+    "pass": true,
+    "evidence": "[{\"key\":\"s\",\"value\":\"S1\",\"secret\":true,\"source\":\"secret\"}]"
+  },
+  {
+    "area": "workspace",
+    "desc": "Apagar vai para lixeira (.jaiminho/lixeira) e some da árvore; body grande também vai",
+    "pass": true,
+    "evidence": "010-r.body.json,010-r.req.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Apagar duas coisas no mesmo milissegundo com mesmo nome de arquivo não perde a primeira na lixeira",
+    "pass": true,
+    "evidence": "2 arquivo(s) na lixeira: .jaiminho/lixeira/1234567890000-b6077acd/010-r.req.yaml, .jaiminho/lixeira/1234567890000-e39caeb4/010-r.req.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Apagar ambiente",
+    "pass": true,
+    "evidence": ""
+  },
+  {
+    "area": "workspace",
+    "desc": "Dois ambientes com o mesmo nome não se sobrescrevem",
+    "pass": true,
+    "evidence": "prod-2.env.yaml,prod.env.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Renomear ambiente renomeia/preserva arquivo (sem duplicar)",
+    "pass": true,
+    "evidence": "dev.env.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "YAML legível (sem caminhos absolutos do PC) em todo o workspace partilhado",
+    "pass": true,
+    "evidence": "com caminho absoluto: []\nid: 01a16d67-5674-7ed2-b88e-f084c98fd5cb\nkind: http\nname: r\nmethod: GET\nurl: http://x\nauth:\n  type: inherit\nbody:\n  mode: raw\n  language: json\n  raw: |-\n    {\n      \"a\": 1\n    }\nscripts:\n  post: |-\n    pm.test(\"a\", () => {\n    })\n"
+  },
+  {
+    "area": "workspace",
+    "desc": "Request salva com chaves \"type\"/\"id\" corretas e sem campos de UI",
+    "pass": true,
+    "evidence": "id: 01a16d67-5676-757d-ae80-5316af4dd804\nkind: http\nname: r\nmethod: GET\nurl: v\nauth:\n  type: inherit\nbody:\n  mode: none\n"
+  },
+  {
+    "area": "workspace",
+    "desc": "Arquivo YAML corrompido (editado à mão / conflito de git) não impede de abrir o workspace",
+    "pass": true,
+    "evidence": "abriu; itens=2"
+  },
+  {
+    "area": "workspace",
+    "desc": "Dois arquivos com o MESMO id (cópia manual de arquivo / merge git) não somem silenciosamente",
+    "pass": true,
+    "evidence": "requests visíveis=2 arquivos=010-orig.req.yaml,020-copia-manual.req.yaml,_collection.yaml"
+  },
+  {
+    "area": "workspace",
+    "desc": "Abrir pasta que não é workspace → erro claro",
+    "pass": true,
+    "evidence": "Não é um workspace do Jaiminho (falta jaiminho.yaml): /tmp"
+  },
+  {
+    "area": "workspace",
+    "desc": "Renomear workspace persiste",
+    "pass": true,
+    "evidence": ""
+  },
+  {
+    "area": "workspace",
+    "desc": ".gitignore inclui .jaiminho/ e .tmp de escrita atômica não sobra",
+    "pass": true,
+    "evidence": "[]"
+  },
+  {
+    "area": "workspace",
+    "desc": "Histórico: grava e lista (limite 2000)",
+    "pass": true,
+    "evidence": "[\"b\",\"a\"]"
+  },
+  {
+    "area": "workspace",
+    "desc": "Segredos com cipher errado (outro PC/usuário) → missingSecrets lista em vez de quebrar",
+    "pass": true,
+    "evidence": "[{\"scope\":\"environment\",\"id\":\"01a16d67-5686-73b8-9e4f-01e84fe32dc3\",\"name\":\"E\",\"key\":\"s\"}]"
+  }
+]

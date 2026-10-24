@@ -1,0 +1,84 @@
+[
+  {
+    "name": "Criar workspace novo VAZIO pela tela inicial (nome com acento)",
+    "ok": true,
+    "ms": 556,
+    "evidence": "pasta=Area de Testes"
+  },
+  {
+    "name": "Criar coleção, renomear, criar pasta e request HTTP pela UI e salvar",
+    "ok": true,
+    "ms": 1543,
+    "evidence": "Area de Testes/collections/nova-colecao/010-pasta-um/010-nova-request.req.yaml"
+  },
+  {
+    "name": "Ambiente novo com variável marcada como SEGREDO: valor fora do YAML; request usa o valor",
+    "ok": true,
+    "ms": 3672,
+    "evidence": "segredo cifrado e resolvido no envio"
+  },
+  {
+    "name": "Botão \"olho\" revela o valor do segredo no editor de ambiente",
+    "ok": true,
+    "ms": 835
+  },
+  {
+    "name": "Importar coleção Postman por ARQUIVO (modal Importar → Arquivo)",
+    "ok": true,
+    "ms": 666,
+    "evidence": "Coleção do Postman importada (1 requests, 1 pastas)"
+  },
+  {
+    "name": "Exportar coleção para Postman (menu de contexto) gera JSON v2.1 válido",
+    "ok": true,
+    "ms": 889,
+    "evidence": "1 item(ns)"
+  },
+  {
+    "name": "Runner com arquivo de dados CSV",
+    "ok": true,
+    "ms": 833,
+    "evidence": "3 requests0 com falha0/0 testes passaram3 iteração(ões)"
+  },
+  {
+    "name": "Cancelar request lenta (/delay/8000) pelo botão Cancelar",
+    "ok": true,
+    "ms": 785,
+    "evidence": "550ms: Cancelado"
+  },
+  {
+    "name": "Temas Padrão / Preto / Branco: aplicam, persistem após recarregar e têm contraste WCAG AA",
+    "ok": true,
+    "ms": 1604,
+    "evidence": "fundos {\"preto\":\"rgb(0, 0, 0)\",\"branco\":\"rgb(233, 237, 246)\",\"padrao\":\"rgb(5, 10, 28)\"}"
+  },
+  {
+    "name": "Botão da paleta no topo troca de tema em ciclo (padrão → preto → branco → padrão)",
+    "ok": true,
+    "ms": 142,
+    "evidence": "padrao → preto → branco → padrao"
+  },
+  {
+    "name": "Ajuda (F1 e botão ?): todos os tópicos abrem com conteúdo, busca filtra e Esc fecha",
+    "ok": true,
+    "ms": 1152,
+    "evidence": "15 tópicos"
+  },
+  {
+    "name": "Link \"Ver tutorial\" do importador abre o tópico certo",
+    "ok": true,
+    "ms": 88,
+    "evidence": "Importar (Swagger, cURL, Postman…)"
+  },
+  {
+    "name": "Fechar a janela com aba suja: diálogo \"Cancelar\" (usuário demora 3 s para responder) mantém a janela aberta",
+    "ok": true,
+    "ms": 4580,
+    "evidence": "janela continua aberta"
+  },
+  {
+    "name": "Sem erros de JavaScript na página durante os fluxos",
+    "ok": true,
+    "ms": 0
+  }
+]
