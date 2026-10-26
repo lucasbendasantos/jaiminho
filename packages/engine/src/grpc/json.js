@@ -6,9 +6,20 @@ const protobuf = require('protobufjs');
 const WRAPPERS = new Set(['DoubleValue', 'FloatValue', 'Int64Value', 'UInt64Value', 'Int32Value', 'UInt32Value', 'BoolValue', 'StringValue', 'BytesValue'].map((n) => `.google.protobuf.${n}`));
 const camel = (s) => s.replace(/_([a-z0-9])/g, (_, c) => c.toUpperCase());
 
+let wktRoot = null;
+/** Tipos google.protobuf.* embutidos (para Any cujo tipo não foi importado pelos .proto carregados). */
+function builtinWkt(name) {
+  if (!/^\.?google\.protobuf\./.test(name)) return null;
+  if (!wktRoot) {
+    wktRoot = new protobuf.Root();
+    for (const k of Object.keys(protobuf.common)) { const j = protobuf.common[k]; if (j && j.nested) { try { wktRoot.addJSON(j.nested); } catch { /* tipo repetido entre arquivos: ignora */ } } }
+  }
+  try { return wktRoot.lookupType(name); } catch { return null; }
+}
+
 function lookupType(root, name) {
-  if (!root) return null;
-  try { return root.lookupType(name); } catch { return null; }
+  if (root) { try { return root.lookupType(name); } catch { /* tenta os embutidos */ } }
+  return builtinWkt(name);
 }
 /** Campo repeated de MapEntry (schemas vindos de descriptor/reflection) tratado como map. */
 function isMapEntry(f) {
@@ -160,7 +171,8 @@ function wktToJson(name, o, registry) {
       const typeName = String(o.type_url || o.typeUrl || '').split('/').pop();
       const t = lookupType(registry, '.' + typeName);
       if (!t) return { '@type': o.type_url || o.typeUrl, value: Buffer.from(o.value || []).toString('base64') };
-      const inner = messageToJson(t, t.decode(o.value), registry);
+      const raw = typeof o.value === 'string' ? Buffer.from(o.value, 'base64') : o.value; // toObject(bytes: String) entrega base64
+      let inner; try { inner = messageToJson(t, t.decode(raw), registry); } catch { return { '@type': o.type_url || o.typeUrl, value: Buffer.from(raw || []).toString('base64') }; }
       return (WRAPPERS.has(t.fullName) || ['.google.protobuf.Timestamp', '.google.protobuf.Duration', '.google.protobuf.Struct', '.google.protobuf.Value', '.google.protobuf.FieldMask'].includes(t.fullName))
         ? { '@type': o.type_url || o.typeUrl, value: inner } : { '@type': o.type_url || o.typeUrl, ...inner };
     }

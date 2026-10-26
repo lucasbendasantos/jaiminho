@@ -7,6 +7,22 @@ const protobuf = require('protobufjs');
 const descriptor = require('protobufjs/ext/descriptor');
 const { reflect } = require('./reflection');
 
+const PROTOBUFJS_DIR = path.dirname(require.resolve('protobufjs/package.json'));
+
+/** Remove ';' repetido (instrução vazia), fora de strings e comentários. */
+function stripEmptyStatements(src) {
+  let out = ''; let i = 0; const n = src.length; let lastSig = '';
+  while (i < n) {
+    const c = src[i]; const d = src[i + 1];
+    if (c === '/' && d === '/') { const e = src.indexOf('\n', i); const end = e < 0 ? n : e; out += src.slice(i, end); i = end; continue; }
+    if (c === '/' && d === '*') { const e = src.indexOf('*/', i + 2); const end = e < 0 ? n : e + 2; out += src.slice(i, end); i = end; continue; }
+    if (c === '"' || c === "'") { let j = i + 1; while (j < n && src[j] !== c) { if (src[j] === '\\') j++; j++; } out += src.slice(i, j + 1); i = j + 1; lastSig = c; continue; }
+    if (c === ';' && lastSig === ';') { i++; continue; }
+    out += c; if (!/\s/.test(c)) lastSig = c; i++;
+  }
+  return out;
+}
+
 /** Carrega .proto: procura na pasta do arquivo → import paths (na ordem) → WKT embutidos do protobufjs. */
 function loadProtoFiles(files, importPaths = [], baseDir) {
   const root = new protobuf.Root();
@@ -14,7 +30,7 @@ function loadProtoFiles(files, importPaths = [], baseDir) {
   const dirs = importPaths.map((p) => (path.isAbsolute(p) ? p : path.join(baseDir || process.cwd(), p)));
   root.resolvePath = (origin, target) => {
     if (path.isAbsolute(target) && fs.existsSync(target)) return target;
-    if (/^google\/protobuf\//.test(target) && protobuf.common[target.replace(/^google\/protobuf\//, '')] !== undefined) return target;
+    if (protobuf.common[target] !== undefined) return target;
     const candidates = [];
     if (origin) candidates.push(path.join(path.dirname(origin), target));
     for (const d of dirs) candidates.push(path.join(d, target));
@@ -22,8 +38,13 @@ function loadProtoFiles(files, importPaths = [], baseDir) {
     // ancestrais do arquivo (import "pacote/x.proto" quando o arquivo está em raiz/pacote/y.proto)
     for (const f of [origin, ...absFiles].filter(Boolean)) { let d = path.dirname(f); for (let i = 0; i < 8 && d && d !== path.dirname(d); i++) { candidates.push(path.join(d, target)); d = path.dirname(d); } }
     for (const c of candidates) if (fs.existsSync(c)) return c;
-    return target; // protobufjs tenta common (google/protobuf/*) e falha com erro claro
+    // WKT que o protobufjs não embute em `common` (descriptor, api, type, source_context): usa os .proto do pacote dele
+    if (/^google\/protobuf\//.test(target)) { const own = path.join(PROTOBUFJS_DIR, target); if (fs.existsSync(own)) return own; }
+    return target; // falha com erro claro
   };
+  // protoc aceita ";;" (instrução vazia); o parser do protobufjs não. Corrige o texto só durante a leitura.
+  const nodeFs = protobuf.util.fs; const origRead = nodeFs && nodeFs.readFileSync;
+  if (origRead) nodeFs.readFileSync = function (f, ...rest) { const b = origRead.call(this, f, ...rest); return /\.proto$/i.test(String(f)) ? Buffer.from(stripEmptyStatements(b.toString('utf8')), 'utf8') : b; };
   try {
     root.loadSync(absFiles, { keepCase: true, alternateCommentMode: true });
     root.resolveAll();
@@ -32,6 +53,7 @@ function loadProtoFiles(files, importPaths = [], baseDir) {
     if (miss) throw new Error(`Import não encontrado: "${miss[1]}". Adicione esse arquivo (ou a pasta raiz dos .proto) em Schema → Import paths, ou use "+ Adicionar .proto" que copia os imports junto.`);
     throw new Error(`Erro ao ler .proto: ${e.message}`);
   }
+  finally { if (origRead) nodeFs.readFileSync = origRead; }
   return root;
 }
 

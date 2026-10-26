@@ -107,7 +107,7 @@ export const SECTIONS = [
     corpo: () => <>
       <p><K>Ctrl+I</K> abre o importador. O tipo é detectado sozinho, em três jeitos: <i>Colar texto</i>, <i>Arquivo</i> e <i>URL</i>.</p>
       <table className="help-table"><tbody>
-        <tr><td><b>Swagger / OpenAPI</b> 2, 3 e 3.1</td><td>URL do JSON/YAML (<code>/v3/api-docs</code>), da página do Swagger UI/springdoc ou arquivo. Cria uma coleção com pastas por tag, parâmetros, exemplos de body e um ambiente por servidor. Depois, clique direito na coleção → <i>Sincronizar com o Swagger…</i> mostra o que mudou.</td></tr>
+        <tr><td><b>Swagger / OpenAPI</b> 2, 3 e 3.1</td><td>URL do JSON/YAML (<code>/v3/api-docs</code>), da página do Swagger UI/springdoc ou arquivo. Cria uma coleção com pastas por tag, parâmetros, exemplos de body e um ambiente por servidor. Depois, clique direito na coleção → <i>Sincronizar com o Swagger…</i> mostra o que mudou. Se você só tem a página do Swagger UI salva como HTML, importe o arquivo: o Jaiminho tenta baixar a especificação original (precisa de rede/VPN) e, sem rede, cria só método e caminho de cada operação.</td></tr>
         <tr><td><b>cURL</b></td><td>Cole o comando (bash, cmd do Windows ou PowerShell). Vira uma request com método, headers, body, auth e flags como <code>-k</code> (desliga SSL) e <code>--cert</code>.</td></tr>
         <tr><td><b>grpcurl</b></td><td>Cole o comando; vira uma request gRPC com endereço, método, mensagem e metadata.</td></tr>
         <tr><td><b>Postman</b></td><td>Coleções v2.0/2.1, ambientes, globais e o backup completo (<i>Importar do Postman</i> na tela inicial).</td></tr>

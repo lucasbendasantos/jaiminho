@@ -5,6 +5,7 @@ const path = require('path');
 const { Workspace, plainCipher, SECRET_MASK } = require('./store');
 const model = require('./model');
 const { sendHttp, listCookies, clearCookies } = require('./http');
+const swaggerPage = require('./io/swagger-page');
 const { buildScopes, effectiveList, makeResolver, unresolved } = require('./vars');
 const grpcClient = require('./grpc/client');
 const { sample } = require('./grpc/sample');
@@ -146,6 +147,7 @@ async function importAuto(ws, { text, buffer, fileName = '', url, parentId, envi
   }
   if (grpcurl.isGrpcurl(t)) { const target = parentId || ensureScratchCollection(ws); return { type: 'grpcurl', requestId: ws.createRequest(target, grpcurl.importGrpcurl(t)) }; }
   if (/<(\w+:)?definitions\b[\s\S]*schemas\.xmlsoap\.org\/wsdl/.test(t)) return { type: 'wsdl', ...wsdl.importWsdl(ws, t, { name }) };
+  if (swaggerPage.detect(t)) return { type: 'openapi', ...(await swaggerPage.importSavedPage(ws, t, { fetchText: fetchTextVia(ws, { environmentId }), name })) };
   const trimmed = t.trim();
   let json; try { json = trimmed.startsWith('{') || trimmed.startsWith('[') ? JSON.parse(trimmed) : undefined; } catch { json = undefined; }
   if (json && (json.openapi || json.swagger)) return { type: 'openapi', ...(await openapi.importOpenApi(ws, { text: trimmed, baseDir: fileName ? require('path').dirname(fileName) : undefined }, { name, createEnvironments })) };
