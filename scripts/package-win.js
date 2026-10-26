@@ -30,7 +30,7 @@ copy(path.join(root, 'packages', 'mocks'), path.join(stage, 'packages', 'mocks')
 const pkg = require(path.join(desktop, 'package.json'));
 const electronVersion = require(path.join(root, 'node_modules', 'electron', 'package.json')).version;
 fs.writeFileSync(path.join(stage, 'package.json'), JSON.stringify({
-  name: 'jaiminho', productName: 'Jaiminho', version: pkg.version, description: pkg.description, author: pkg.author, license: 'MIT', main: 'main/main.js',
+  name: 'jaiminho', productName: 'Jaiminho', version: pkg.version, description: pkg.description, author: pkg.author, license: 'Apache-2.0', main: 'main/main.js',
   dependencies: { '@jaiminho/engine': 'file:./packages/engine', '@jaiminho/mocks': 'file:./packages/mocks' },
 }, null, 2));
 run('npm install --omit=dev --install-links --no-audit --no-fund', stage);

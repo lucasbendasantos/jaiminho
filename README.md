@@ -35,8 +35,8 @@ O nome é uma homenagem ao carteiro do seriado *Chaves*: quem leva a mensagem at
 
 Baixe nos **Releases** do repositório:
 
-- `Jaiminho-Setup-0.1.0.exe`: instalador. Não pede administrador e deixa escolher a pasta.
-- `Jaiminho-0.1.0-portatil.exe`: executável único, roda sem instalar.
+- `Jaiminho-Setup-1.0.0.exe`: instalador. Não pede administrador e deixa escolher a pasta.
+- `Jaiminho-1.0.0-portatil.exe`: executável único, roda sem instalar.
 
 Os dois levam tudo dentro (motor, mocks, fontes) e funcionam offline. **Os binários ainda não são assinados**, então o SmartScreen avisa na primeira execução: *Mais informações → Executar assim mesmo*.
 

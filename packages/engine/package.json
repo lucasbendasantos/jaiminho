@@ -1,8 +1,8 @@
 {
   "name": "@jaiminho/engine",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "main": "src/index.js",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "test": "node --test --test-concurrency=1 test/*.test.js"
   },

@@ -104,3 +104,23 @@ service S { rpc Do (Msg) returns (Msg); }
   assert.equal(back.attrs.chave.value, 'texto');
   assert.equal(back.img, 'AQID');
 });
+
+test('URL da página do Swagger UI com ?urls.primaryName= importa o grupo certo (springdoc)', async () => {
+  const mk = (t) => JSON.stringify({ openapi: '3.0.0', info: { title: t, version: '1' }, paths: { [`/${t}/ping`]: { get: { summary: t } } } });
+  const fetchText = async (u) => {
+    const p = new URL(u).pathname;
+    if (p === '/swagger-ui/index.html') return { status: 200, body: '<html>swagger-ui</html>' };
+    if (p === '/v3/api-docs/swagger-config') return { status: 200, body: JSON.stringify({ urls: [{ name: 'Alpha', url: '/g/alpha' }, { name: 'Beta', url: '/g/beta' }] }) };
+    if (p === '/g/alpha') return { status: 200, body: mk('alpha') };
+    if (p === '/g/beta') return { status: 200, body: mk('beta') };
+    return { status: 404, body: '' };
+  };
+  const base = 'https://x.local/swagger-ui/index.html';
+  const ws = tmpWorkspace();
+  await E.openapi.importOpenApi(ws, { url: `${base}?urls.primaryName=Beta`, fetchText }, {});
+  assert.equal(ws.tree().collections[0].name, 'beta');
+  await assert.rejects(() => E.openapi.importOpenApi(tmpWorkspace(), { url: `${base}?urls.primaryName=Zeta`, fetchText }, {}), /Grupo "Zeta" não existe.*Alpha, Beta/);
+  const ws2 = tmpWorkspace();
+  await E.openapi.importOpenApi(ws2, { url: base, fetchText }, {});
+  assert.equal(ws2.tree().collections[0].name, 'alpha');
+});

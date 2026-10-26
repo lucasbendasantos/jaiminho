@@ -92,9 +92,16 @@ async function fetchSpec(url, fetchText) {
   if (cfgRoot && cfgRoot.status === 200 && (cfg = cfgRoot)) {
     try {
       const c = JSON.parse(cfg.body);
-      const list = (c.urls || []).map((x) => x.url).concat(c.url ? [c.url] : []);
+      const wanted = u.searchParams.get('urls.primaryName');
+      let groups = c.urls || [];
+      if (wanted) {
+        const g = groups.find((x) => x.name === wanted || x.url === wanted);
+        if (!g) throw new Error(`Grupo "${wanted}" não existe neste Swagger. Grupos: ${groups.map((x) => x.name).join(', ')}`);
+        groups = [g, ...groups.filter((x) => x !== g)];
+      }
+      const list = groups.map((x) => x.url).concat(c.url ? [c.url] : []);
       for (const p of list) { const full = new URL(p, `${u.protocol}//${u.host}`).toString(); const r = await tryUrl(full); if (r && !r.ui) return { ...r, groups: c.urls }; }
-    } catch { /* segue */ }
+    } catch (e) { if (/^Grupo "/.test(e.message)) throw e; /* segue */ }
   }
   for (const b of [...new Set([base, `${u.protocol}//${u.host}`])]) for (const p of ['/v3/api-docs', '/v2/api-docs', '/openapi.json', '/swagger.json', '/openapi.yaml', '/api-docs', '/swagger/v1/swagger.json']) {
     const r = await tryUrl(`${b}${p}`).catch(() => null);

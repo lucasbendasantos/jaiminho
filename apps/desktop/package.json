@@ -1,11 +1,10 @@
 {
   "name": "jaiminho-desktop",
   "productName": "Jaiminho",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Jaiminho — cliente de API local e offline (HTTP/JSON, XML/SOAP, gRPC)",
-  "author": "Lucas Benda dos Santos",
+  "author": "Lucas",
   "license": "Apache-2.0",
-  "repository": { "type": "git", "url": "git+https://github.com/lucasbendasantos/jaiminho.git" },
   "main": "main/main.js",
   "scripts": {
     "build:ui": "vite build --config renderer/vite.config.mjs",

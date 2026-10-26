@@ -1,8 +1,8 @@
 {
   "name": "@jaiminho/mocks",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "main": "src/index.js",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@grpc/grpc-js": "^1.14.0",
     "@grpc/proto-loader": "^0.8.0",
