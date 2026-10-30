@@ -72,6 +72,7 @@ flowchart LR
 jaiminho/
 ├─ apps/
 │  ├─ desktop/            Electron: main/, preload/, renderer/ (React)
+│  ├─ web/                servidor Node + shim do navegador (versão web e Docker)
 │  └─ cli/                jaiminho run|import|export
 ├─ packages/
 │  ├─ model/              tipos do workspace (YAML) + conversão YAML ⇄ Postman Collection v2.1
@@ -169,3 +170,20 @@ Nomes dos eventos gRPC seguem os do Postman (`sent-request-header`, `sent-reques
 | Proxy/PAC corporativo | `session.resolveProxy` do Electron para descobrir o proxy por URL e passar ao motor; opção manual por workspace |
 | `pm.*` em gRPC não coberto pelo `postman-sandbox` open source | implementar os hooks gRPC na camada `scripting` (a confirmar no código do sandbox) |
 | Antivírus implicar com `.exe` não assinado | assinar com certificado interno da empresa, se houver; portable como alternativa |
+
+## 10. Versão web e Docker (1.1)
+
+`apps/web` serve o mesmo `renderer/dist` a um navegador. O `server.js` (Node, sem Electron) injeta `client/shim.js`, que implementa `window.jaiminho`: `call` vira `POST /api/call`, eventos chegam por SSE (`/api/events`), diálogos viram janelas na página, o seletor de pastas/arquivos lista o **servidor** (limitado a `JAIMINHO_ROOT`) e aceita envio de arquivos, e "Salvar como" gera o arquivo no servidor e o navegador baixa.
+
+Cada usuário tem um processo `carteiro-host.js` (o mesmo `carteiro.js` do desktop, com `process.parentPort` adaptado sobre `process.send`), desligado após 30 min sem uso. O motor não muda; só o transporte.
+
+| Ameaça | Mitigação |
+|---|---|
+| Acesso não autorizado | HTTP Basic obrigatório; senha gerada na 1ª subida; bloqueio de IP após 10 erros em 5 min |
+| CSRF | POST exige `x-jaiminho-web: 1` e Origin igual; GET rejeita `sec-fetch-site: cross-site` |
+| Leitura/escrita fora da área | argumentos `dir`/`file`/`dataFile` e navegação do seletor resolvidos (inclui symlink) e confinados a `JAIMINHO_ROOT` |
+| Vazamento entre usuários | motor, configurações, uploads e downloads por usuário |
+| Segredos em repouso | cifrados com `secrets.key` (0600) ou `JAIMINHO_SECRET_KEY` |
+| Uso do servidor como "máquina de requests" | risco aceito para quem autentica; documentado; usar HTTPS e rede restrita |
+
+Docker: build multi-estágio (UI compilada no 1º, só dependências de produção no 2º), usuário `node`, volume `/data`, `HEALTHCHECK /healthz`. Detalhes de uso em `docs/web-docker.md`.

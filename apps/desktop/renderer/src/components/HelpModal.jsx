@@ -8,7 +8,7 @@ const Code = ({ children }) => <pre className="help-code mono">{children}</pre>;
 const Tip = ({ children }) => <div className="help-tip">{children}</div>;
 const Warn = ({ children }) => <div className="help-tip warn">{children}</div>;
 
-export const SHORTCUTS = [['Ctrl+Enter', 'Enviar / invocar'], ['Ctrl+S', 'Salvar'], ['Ctrl+Shift+S', 'Salvar como (cópia)'], ['Ctrl+N', 'Nova request'], ['Ctrl+O', 'Abrir workspace'], ['Ctrl+W', 'Fechar aba'], ['Ctrl+Tab / Ctrl+Shift+Tab', 'Próxima / anterior aba'], ['Ctrl+L', 'Ir para a URL'], ['Ctrl+I', 'Importar'], ['Ctrl+E', 'Variáveis efetivas'], ['Ctrl+,', 'Configurações'], ['Ctrl+R', 'Runner da seleção'], ['F1', 'Tutoriais e ajuda'], ['F2', 'Renomear item da árvore'], ['Del', 'Apagar item da árvore'], ['↑ ↓ ← →', 'Navegar na árvore'], ['Shift+F10', 'Menu de contexto'], ['Esc', 'Cancelar envio / fechar modal']];
+export const SHORTCUTS = [['Ctrl+Enter', 'Enviar / invocar'], ['Ctrl+S', 'Salvar'], ['Ctrl+Shift+S', 'Salvar como (cópia)'], ['Ctrl+N', 'Nova request'], ['Ctrl+O', 'Abrir workspace'], ['Ctrl+W', 'Fechar aba'], ['Ctrl+Tab / Ctrl+Shift+Tab', 'Próxima / anterior aba'], ['Ctrl+L', 'Ir para a URL'], ['Ctrl+F', 'Buscar no corpo/resposta (no painel esquerdo, filtra a árvore)'], ['Ctrl+I', 'Importar'], ['Ctrl+E', 'Variáveis efetivas'], ['Ctrl+,', 'Configurações'], ['Ctrl+R', 'Runner da seleção'], ['F1', 'Tutoriais e ajuda'], ['F2', 'Renomear item da árvore'], ['Del', 'Apagar item da árvore (ou os selecionados)'], ['Ctrl+clique / Shift+clique', 'Selecionar várias requests na árvore (arraste para mover todas)'], ['↑ ↓ ← →', 'Navegar na árvore'], ['Shift+F10', 'Menu de contexto'], ['Esc', 'Cancelar envio / fechar modal']];
 
 export const SECTIONS = [
   {
@@ -167,10 +167,10 @@ export const SECTIONS = [
     </>,
   },
   {
-    id: 'temas', titulo: 'Temas e aparência', kw: 'tema escuro claro preto branco padrao aparencia layout',
+    id: 'temas', titulo: 'Temas e aparência', kw: 'tema escuro claro preto branco padrao aparencia layout lado a lado embaixo resposta',
     corpo: () => <>
       <p>Três temas: <b>Padrão</b> (azul-marinho da identidade do Jaiminho), <b>Preto</b> (preto puro, bom para telas OLED e ambientes escuros) e <b>Branco</b> (claro, alto contraste). Troque pelo botão da paleta no topo (cada clique passa para o próximo) ou em <i>Configurações → Este PC</i>; a escolha fica salva.</p>
-      <p>Também em <i>Este PC</i>: posição da resposta (embaixo ou ao lado). Arraste a borda do painel esquerdo para mudar a largura.</p>
+      <p>A posição da resposta (embaixo ou ao lado da request) alterna pelo botão de colunas/linhas ao lado de <i>Salvar</i>, em cada request. Arraste a borda do painel esquerdo para mudar a largura.</p>
     </>,
   },
   {

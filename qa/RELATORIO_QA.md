@@ -46,6 +46,22 @@ Data: 2026-10-24 · commit base `d70d3ea` (+ este relatório)
 | XML | pretty quebrava CDATA e comentários | preservados |
 | UI | fechar a janela com aba suja fechava sozinho após 1,5 s | só força se a tela não responder |
 
+## Versão 1.1.0 (só as novidades)
+
+| Suíte | Resultado | O que cobre |
+|---|---|---|
+| `e2e-melhorias.js` | 8/8 | Ctrl+Enter, Ctrl+F (3 casos), botão de layout, arrastar 3 requests, Shift+clique |
+| `e2e-v110-bordas.js` | 13/13 | pasta+filho, soltar na própria pasta, mover e reordenar entre coleções, Delete em lote (confirma/cancela), Ctrl+Enter em scripts, Esc da busca, layout após recarregar, 1000 px sem estourar a janela, contraste da busca nos 3 temas, aria |
+| `e2e-web.js` | 13/13 | 401/healthz, CSRF, guarda de caminhos, página, seletor de pasta, envio, download, upload, recarga |
+| `web-api.js` | 11/11 | dois usuários isolados, travessia (`..`, `/etc`, symlink), download de outro usuário, upload (nome, lote, limite), SSE com e sem senha, rota/JSON inválidos, bloqueio por senha errada, `AUTH=none`, `auth.json` 0600 |
+| `uxreview/ux-v110.js` | 12/12 | diálogos web: aria, foco, Tab, Esc, 390 px, 3 temas |
+
+Bugs encontrados nesta rodada e corrigidos: bloqueio por IP contava requisições sem credencial; `HTTPS_PROXY` era aplicado a localhost (agora `NO_PROXY` e localhost direto); download sem nome ASCII no Content-Disposition; layout estourando a janela abaixo de ~1100 px; diálogos web sem `aria-modal`, foco solto e Tab vazando para o app; abas e botões sobrepostos no lado a lado.
+
+Não testado aqui: a **imagem Docker** (o Docker Hub é bloqueado no ambiente de build). O estágio de execução foi simulado em diretório limpo (`npm ci --omit=dev` + servidor + `/healthz`). Rode `docker compose up -d --build` uma vez no seu servidor para confirmar.
+
+Como rodar tudo: `bash qa/run-all.sh`
+
 ## Como rodar
 
 ```

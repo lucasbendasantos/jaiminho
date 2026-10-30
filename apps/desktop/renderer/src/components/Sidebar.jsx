@@ -63,6 +63,41 @@ function nodeMenu(node) {
   return items;
 }
 
+/** id → { node, parentId, ancestors:Set } para a árvore inteira (usado na multisseleção e no arrastar). */
+function indexTree(tree) {
+  const m = new Map();
+  const walk = (n, parentId, anc) => { m.set(n.id, { node: n, parentId, ancestors: anc }); const a2 = new Set(anc); a2.add(n.id); for (const c of n.children || []) walk(c, n.id, a2); };
+  for (const c of (tree && tree.collections) || []) walk(c, null, new Set());
+  return m;
+}
+/** Dos ids selecionados, só os que podem ser movidos: sem coleções, sem filhos de quem já vai junto e sem o destino. */
+export function movableIds(tree, ids, targetId) {
+  const idx = indexTree(tree); const set = new Set(ids);
+  return ids.filter((id) => { const e = idx.get(id); if (!e || e.node.type === 'collection' || id === targetId) return false; for (const a of e.ancestors) if (set.has(a)) return false; const t = idx.get(targetId); return !(t && t.ancestors.has(id)); });
+}
+function toggleMulti(id) {
+  setState((s) => {
+    const cur = s.multi.length ? s.multi : (s.selected ? [s.selected] : []);
+    return { multi: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id], selected: id };
+  });
+}
+function rangeMulti(id) {
+  const rows = [...document.querySelectorAll('[role=treeitem]')].map((r) => r.dataset.nodeId);
+  const from = rows.indexOf(getState().selected); const to = rows.indexOf(id);
+  if (from < 0 || to < 0) return setState({ multi: [id], selected: id });
+  const [a, b] = from < to ? [from, to] : [to, from];
+  setState({ multi: rows.slice(a, b + 1) });
+}
+async function removeMany(ids) {
+  const tree = getState().tree; const idx = indexTree(tree);
+  const list = ids.filter((id) => { const e = idx.get(id); return e && !(e.node.type === 'collection') && ![...e.ancestors].some((a) => ids.includes(a)); });
+  if (!list.length) return;
+  const r = await api$.dialog.confirm({ message: `Apagar ${list.length} item(ns) selecionado(s)?`, detail: 'Vão para a lixeira do workspace (.jaiminho/lixeira).', buttons: ['Cancelar', 'Apagar'] });
+  if (r !== 1) return;
+  for (const id of list) { await safe(() => call('item:remove', { id })); for (const t of getState().tabs.filter((tt) => tt.itemId === id)) await closeTab(t.key, true); }
+  setState({ multi: [] }); await refreshTree();
+}
+
 /** Quantos nós a árvore tem (para decidir se abre tudo ou só o 1º nível). */
 function countNodes(n) { return 1 + (n.children || []).reduce((a, c) => a + countNodes(c), 0); }
 const BIG_TREE = 400;
@@ -74,6 +109,7 @@ const TreeNode = React.memo(function TreeNode({ node, depth, filter, parentId, i
   });
   const selected = useStore((s) => s.selected === node.id);
   const renaming = useStore((s) => s.renaming === node.id);
+  const inMulti = useStore((s) => s.multi.includes(node.id));
   const [drop, setDrop] = useState(false);
   const isContainer = node.type !== 'request';
   const toggle = () => { setOpen(!open); try { localStorage.setItem(`open:${node.id}`, open ? '0' : '1'); } catch { /* ignore */ } };
@@ -81,25 +117,40 @@ const TreeNode = React.memo(function TreeNode({ node, depth, filter, parentId, i
   if (!match(node)) return null;
   const onDrop = async (e) => {
     e.preventDefault(); e.stopPropagation(); setDrop(false);
-    const id = e.dataTransfer.getData('jaiminho/id'); if (!id || id === node.id) return;
-    if (isContainer) await safe(() => call('item:move', { id, parentId: node.id }));
-    else await safe(() => call('item:move', { id, parentId, index }));
-    await refreshTree();
+    let ids = [];
+    try { ids = JSON.parse(e.dataTransfer.getData('jaiminho/ids') || '[]'); } catch { /* ignore */ }
+    if (!ids.length) { const one = e.dataTransfer.getData('jaiminho/id'); if (one) ids = [one]; }
+    ids = movableIds(getState().tree, ids, node.id); if (!ids.length) return;
+    let moved = 0;
+    for (const [k, id] of ids.entries()) {
+      const ok = isContainer ? await safe(() => call('item:move', { id, parentId: node.id })) : await safe(() => call('item:move', { id, parentId, index: index + k }));
+      if (ok !== undefined) moved++;
+    }
+    setState({ multi: [] }); await refreshTree();
+    if (moved > 1) toast(`${moved} itens movidos`, 'ok', 2000);
+  };
+  const onDragStart = (e) => {
+    const m = getState().multi;
+    const ids = m.length > 1 && m.includes(node.id) ? m : [node.id];
+    if (!(m.length > 1 && m.includes(node.id)) && m.length) setState({ multi: [] });
+    e.dataTransfer.setData('jaiminho/id', node.id); e.dataTransfer.setData('jaiminho/ids', JSON.stringify(ids)); e.dataTransfer.effectAllowed = 'move';
+    if (ids.length > 1) { const g = document.createElement('div'); g.textContent = `${ids.length} itens`; g.style.cssText = 'position:fixed;top:-100px;padding:4px 10px;border-radius:6px;background:#2a4bd7;color:#fff;font:12px sans-serif'; document.body.appendChild(g); e.dataTransfer.setDragImage(g, 10, 10); setTimeout(() => g.remove(), 0); }
   };
   return (
     <div>
-      <div className={`tree-row ${selected ? 'sel' : ''} ${drop ? 'drop' : ''} ${node.deprecated ? 'deprecated' : ''}`} style={{ paddingLeft: 6 + depth * 14 }}
-        draggable={node.type !== 'collection'} onDragStart={(e) => e.dataTransfer.setData('jaiminho/id', node.id)}
+      <div className={`tree-row ${selected ? 'sel' : ''} ${inMulti ? 'multi' : ''} ${drop ? 'drop' : ''} ${node.deprecated ? 'deprecated' : ''}`} style={{ paddingLeft: 6 + depth * 14 }}
+        draggable={node.type !== 'collection'} onDragStart={onDragStart}
         onDragOver={(e) => { e.preventDefault(); setDrop(true); }} onDragLeave={() => setDrop(false)} onDrop={onDrop}
-        onClick={() => { if (isContainer) toggle(); else openItem(node.id, 'request'); setState({ selected: node.id }); }}
+        onClick={(e) => { if (e.ctrlKey || e.metaKey) { toggleMulti(node.id); return; } if (e.shiftKey) { rangeMulti(node.id); return; } if (getState().multi.length) setState({ multi: [] }); if (isContainer) toggle(); else openItem(node.id, 'request'); setState({ selected: node.id }); }}
         onDoubleClick={() => isContainer && openItem(node.id, node.type)}
-        onContextMenu={(e) => showMenu(e, nodeMenu(node))} data-testid={`node-${node.name}`} title={node.name}
-        role="treeitem" aria-expanded={isContainer ? open : undefined} aria-selected={selected} tabIndex={0} data-node-id={node.id}
+        onContextMenu={(e) => { const m = getState().multi; showMenu(e, m.length > 1 && m.includes(node.id) ? [{ id: 'del-multi', label: `Apagar ${m.length} selecionados`, danger: true, run: () => removeMany(m) }, { id: 'clear-multi', label: 'Limpar seleção', run: () => setState({ multi: [] }) }] : nodeMenu(node)); }} data-testid={`node-${node.name}`} title={node.name}
+        role="treeitem" aria-expanded={isContainer ? open : undefined} aria-selected={selected || inMulti} tabIndex={0} data-node-id={node.id}
         onKeyDown={(e) => {
           if (renaming) return;
           if (e.key === 'Enter') { if (isContainer) openItem(node.id, node.type); else openItem(node.id, 'request'); e.preventDefault(); }
           else if (e.key === 'F2') { setState({ renaming: node.id }); e.preventDefault(); }
-          else if (e.key === 'Delete') { removeItem(node); e.preventDefault(); }
+          else if (e.key === 'Delete') { const m = getState().multi; if (m.length > 1 && m.includes(node.id)) removeMany(m); else removeItem(node); e.preventDefault(); }
+          else if (e.key === 'Escape' && getState().multi.length) { setState({ multi: [] }); e.preventDefault(); }
           else if (e.key === 'ArrowRight' && isContainer && !open) { toggle(); e.preventDefault(); }
           else if (e.key === 'ArrowLeft' && isContainer && open) { toggle(); e.preventDefault(); }
           else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { const rows = [...document.querySelectorAll('[role=treeitem]')]; const i = rows.indexOf(e.currentTarget); const n = rows[i + (e.key === 'ArrowDown' ? 1 : -1)]; if (n) { n.focus(); setState({ selected: n.dataset.nodeId }); } e.preventDefault(); }

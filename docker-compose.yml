@@ -1,0 +1,24 @@
+# Jaiminho Web em servidor Linux:  cp .env.example .env  (edite a senha)  &&  docker compose up -d --build
+services:
+  jaiminho:
+    build: .
+    image: jaiminho-web:1.1.0
+    container_name: jaiminho
+    init: true                       # encerra direitinho os processos filhos (motor de envio, sandbox de scripts)
+    restart: unless-stopped
+    ports:
+      - "${JAIMINHO_PUBLISH:-127.0.0.1:8080}:8080"   # por padrão só local; ponha 0.0.0.0:8080 ou use um proxy HTTPS na frente
+    environment:
+      JAIMINHO_USER: "${JAIMINHO_USER:-jaiminho}"
+      JAIMINHO_PASSWORD: "${JAIMINHO_PASSWORD:?defina JAIMINHO_PASSWORD no .env}"
+      JAIMINHO_USERS: "${JAIMINHO_USERS:-}"            # vários usuários: "ana:senha1,beto:senha2" (cada um tem workspace/estado próprios)
+      JAIMINHO_SECRET_KEY: "${JAIMINHO_SECRET_KEY:-}"  # opcional: base64 de 32 bytes (padrão: gerada em /data/secrets.key)
+      HTTPS_PROXY: "${HTTPS_PROXY:-}"
+      HTTP_PROXY: "${HTTP_PROXY:-}"
+      NO_PROXY: "${NO_PROXY:-localhost,127.0.0.1}"
+    volumes:
+      - jaiminho-data:/data            # workspaces, segredos cifrados, uploads e configurações
+    # Para alcançar serviços da rede/VPN do host a partir do container, descomente:
+    # network_mode: host
+volumes:
+  jaiminho-data:

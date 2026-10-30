@@ -7,6 +7,7 @@ import { useStore, setState, getState, call, boot, applySummary, openModal, clos
 import { sendTab, cancelTab } from './send';
 import Icon from './icons';
 import { showMenu } from './components/Sidebar';
+import { openSearchInPane } from './components/Editor';
 
 function Welcome() {
   const [recent, setRecent] = useState([]);
@@ -150,6 +151,11 @@ export default function App() {
   const booted = useStore((s) => s.booted); const ws = useStore((s) => s.ws);
   const [showVars, setShowVars] = useState(false);
   const [sideW, setSideW] = useState(() => Number(localStorage.getItem('side-w')) || 290);
+  useEffect(() => { // versão web: avisa antes de fechar/recarregar a aba com requests não salvas
+    if (!window.__jaiminhoWeb) return undefined;
+    const h = (e) => { if (getState().tabs.some(isDirty)) { e.preventDefault(); e.returnValue = ''; } };
+    window.addEventListener('beforeunload', h); return () => window.removeEventListener('beforeunload', h);
+  }, []);
   useEffect(() => { boot().then(async () => { const a = await call('app:settings'); if (a.layout) setState({ layout: a.layout }); }); }, []);
   useEffect(() => api$.on(async (e) => {
     const s = getState();
@@ -192,6 +198,13 @@ export default function App() {
       else if (e.key === 'F1') { e.preventDefault(); openHelp(); }
       else if (ctrl && e.key === 'n') { e.preventDefault(); if (s.ws) newDraftRequest('http'); }
       else if (ctrl && e.key === 'l') { e.preventDefault(); window.dispatchEvent(new Event('jaiminho:focus-url')); }
+      else if (ctrl && !e.shiftKey && (e.key === 'f' || e.key === 'F')) {
+        if (document.activeElement && document.activeElement.closest && document.activeElement.closest('.cm-editor')) return; // o próprio editor abre a busca
+        e.preventDefault();
+        const inSide = document.activeElement && document.activeElement.closest && document.activeElement.closest('.sidebar');
+        if (!inSide && openSearchInPane()) return;
+        const f = document.querySelector('[data-testid=tree-filter]') || document.querySelector('.sidebar input.in'); if (f) { f.focus(); f.select(); }
+      }
       else if (ctrl && e.key === 'e') { e.preventDefault(); setShowVars((v) => !v); }
       else if (ctrl && e.key === 'i') { e.preventDefault(); if (s.ws) openModal('import'); }
       else if (ctrl && e.key === ',') { e.preventDefault(); if (s.ws) openModal('settings'); }

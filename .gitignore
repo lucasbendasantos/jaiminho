@@ -6,3 +6,4 @@ out/
 release/
 scratch/
 packages/mocks/certs/
+.env

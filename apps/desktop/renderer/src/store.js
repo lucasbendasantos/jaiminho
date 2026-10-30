@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react';
 const api = window.jaiminho;
 let state = {
   ws: null, tree: null, envs: [], activeEnvId: null, missingSecrets: [],
-  tabs: [], activeTab: null, toasts: [], modal: null, sidebar: 'collections', selected: null,
+  tabs: [], activeTab: null, toasts: [], modal: null, sidebar: 'collections', selected: null, multi: [],
   theme: 'padrao', layout: 'vertical', mocks: { running: false }, booted: false,
 };
 const subs = new Set();

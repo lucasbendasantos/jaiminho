@@ -9,8 +9,11 @@ done
 # Interface (precisa de display virtual): fluxo completo, extras (temas, ajuda, cancelar...) e performance da UI
 if command -v xvfb-run >/dev/null; then
   ( cd ../apps/desktop && npx vite build --config renderer/vite.config.mjs >/dev/null 2>&1
-    for t in e2e/flow.js ../../qa/e2e-extra.js ../../qa/perf-ui.js; do
+    for t in e2e/flow.js ../../qa/e2e-extra.js ../../qa/perf-ui.js ../../qa/e2e-melhorias.js ../../qa/e2e-v110-bordas.js; do
       timeout 900 xvfb-run -a -s "-screen 0 1440x900x24" node $t > "../../qa/results/$(basename $t .js).log" 2>&1
       grep -E "^== |passaram" "../../qa/results/$(basename $t .js).log" | tail -1 || echo "== $t: ver log"
     done )
 fi
+# Versão web (Chromium + servidor Node; não precisa de display)
+( cd ../apps/desktop && timeout 600 node ../../qa/e2e-web.js > ../../qa/results/e2e-web.log 2>&1; grep -E "^== " ../../qa/results/e2e-web.log | tail -1 || echo "== e2e-web: ver log" )
+( timeout 300 node web-api.js > results/web-api.log 2>&1; grep -E "^== " results/web-api.log | tail -1 || echo "== web-api: ver log" )

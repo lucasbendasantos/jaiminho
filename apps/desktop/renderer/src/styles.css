@@ -29,13 +29,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 ::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
 
-.app { display: grid; grid-template-rows: 58px 1fr 24px; height: 100%; }
+.app { display: grid; grid-template-rows: 58px 1fr 24px; grid-template-columns: minmax(0, 1fr); height: 100%; }
 .topbar { display: flex; align-items: center; gap: 10px; padding: 0 12px; background: linear-gradient(90deg, var(--bg1), color-mix(in srgb, var(--azul-profundo) 55%, var(--bg1)) 55%, color-mix(in srgb, var(--violeta) 35%, var(--bg1))); border-bottom: 1px solid var(--line); }
 :root[data-theme="branco"] .topbar { background: linear-gradient(90deg, #fff, #e7eefc 60%, #efe6fb); }
 .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: .2px; font-size: 17px; }
 .brand img { width: 42px; height: 42px; border-radius: 10px; }
 .topbar .spacer { flex: 1; }
-.main { display: grid; grid-template-columns: var(--sidebar-w, 290px) 4px 1fr; min-height: 0; }
+.main { display: grid; grid-template-columns: var(--sidebar-w, 290px) 4px minmax(0, 1fr); min-height: 0; }
 .statusbar { display: flex; gap: 14px; align-items: center; padding: 0 10px; font-size: 11.5px; color: var(--muted); background: var(--bg1); border-top: 1px solid var(--line); }
 .statusbar .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
@@ -247,3 +247,26 @@ label.chk { display: inline-flex; align-items: center; gap: 6px; cursor: pointer
 :root[data-theme="branco"] .cm-activeLine, :root[data-theme="branco"] .cm-activeLineGutter { background-color: color-mix(in srgb, var(--azul) 8%, transparent) !important; }
 @media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 .method-picker .row button.icon-btn { width: auto; flex: none; padding: 4px 6px; }
+
+/* Busca do editor (Ctrl+F) com a paleta do tema */
+.cm-search { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; padding: 6px 8px !important; font-size: 12px; }
+.cm-search input[type=text], .cm-search input:not([type]) { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 3px 7px; height: 24px; font: inherit; }
+.cm-search input:focus { outline: none; border-color: var(--azul); }
+.cm-search button { background: var(--bg3); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 2px 8px; height: 24px; cursor: pointer; font: inherit; }
+.cm-search button[name=close] { background: transparent; border: none; color: var(--muted); font-size: 16px; position: absolute; right: 6px; top: 4px; }
+.cm-search label { color: var(--muted); display: inline-flex; gap: 4px; align-items: center; }
+.cm-search br { display: none; }
+.cm-searchMatch { background: color-mix(in srgb, var(--dourado) 30%, transparent) !important; }
+.cm-searchMatch-selected { background: color-mix(in srgb, var(--azul) 45%, transparent) !important; }
+.tree-row.multi { background: color-mix(in srgb, var(--azul) 24%, transparent); }
+
+/* Lado a lado: cada painel encolhe e rola em vez de sobrepor o vizinho */
+.split.horizontal > .box, .split.horizontal > .resp-empty { min-width: 0; overflow: hidden; }
+.subtabs { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; flex-shrink: 0; }
+.subtabs button { flex: none; white-space: nowrap; }
+.split.horizontal .row { flex-wrap: wrap; }
+/* Busca do CodeMirror: os botões trazem gradiente claro próprio; força a paleta do tema */
+.cm-panel.cm-search button.cm-button, .cm-search button { background-image: none !important; background-color: var(--bg3) !important; color: var(--text) !important; border: 1px solid var(--line) !important; }
+.cm-panel.cm-search button.cm-button:hover { background-color: var(--bg2) !important; }
+.cm-panel.cm-search [name=close] { background: transparent !important; border: 0 !important; }
+.cm-panel.cm-search input.cm-textfield { background: var(--bg) !important; color: var(--text) !important; border: 1px solid var(--line) !important; }

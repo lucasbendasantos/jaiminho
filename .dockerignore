@@ -1,0 +1,14 @@
+.git
+**/node_modules
+**/dist
+release
+scratch
+uxreview
+qa/shots
+qa/results
+**/*.log
+**/.jaiminho
+docs
+branding
+*.md
+!packages/**/README.md

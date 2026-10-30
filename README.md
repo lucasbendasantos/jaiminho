@@ -35,12 +35,23 @@ O nome é uma homenagem ao carteiro do seriado *Chaves*: quem leva a mensagem at
 
 Baixe nos **Releases** do repositório:
 
-- `Jaiminho-Setup-1.0.0.exe`: instalador. Não pede administrador e deixa escolher a pasta.
-- `Jaiminho-1.0.0-portatil.exe`: executável único, roda sem instalar.
+- `Jaiminho-Setup-1.1.0.exe`: instalador. Não pede administrador e deixa escolher a pasta.
+- `Jaiminho-1.1.0-portatil.exe`: executável único, roda sem instalar.
 
 Os dois levam tudo dentro (motor, mocks, fontes) e funcionam offline. **Os binários ainda não são assinados**, então o SmartScreen avisa na primeira execução: *Mais informações → Executar assim mesmo*.
 
 Na tela inicial, **Workspace de exemplo** cria coleções REST, HTTPS/mTLS, SOAP, gRPC e Swagger já apontando para servidores *mock* embutidos. É a forma mais rápida de conhecer o app.
+
+## Usar no navegador ou em servidor (Docker)
+
+Não consegue instalar programas, ou quer um Jaiminho compartilhado pela equipe num servidor Linux? A mesma interface roda no **navegador**, com o motor no servidor:
+
+```bash
+cp .env.example .env              # defina JAIMINHO_PASSWORD
+docker compose up -d --build      # http://localhost:8080
+```
+
+Tem login com senha (um ou vários usuários, cada um com o seu estado), seletor de pastas do servidor, envio de arquivos pelo navegador e download das exportações. Detalhes, segurança, proxy reverso com HTTPS e backup em [`docs/web-docker.md`](docs/web-docker.md).
 
 ## Capturas de tela
 
@@ -134,6 +145,7 @@ npm install                          # na raiz (npm workspaces)
 npm test                             # testes do motor
 npm run mocks                        # sobe os mocks (4010, 4443, 4444, 50051–50053)
 npm run dev                          # build da UI + abre o app
+npm run build:ui && npm run web      # versão web em http://127.0.0.1:8080 (ver docs/web-docker.md)
 bash qa/run-all.sh                   # QA completo
 cd apps/desktop && xvfb-run -a node e2e/flow.js   # e2e (Linux, headless)
 node scripts/package-win.js          # gera instalador e portátil em release/ (no Linux precisa do wine)
@@ -145,6 +157,7 @@ node scripts/package-win.js          # gera instalador e portátil em release/ (
 packages/engine   motor: workspace YAML, variáveis, HTTP/SOAP, gRPC, import/export
 packages/mocks    servidores mock (REST, XML, SOAP, Swagger, HTTPS, mTLS, gRPC)
 apps/desktop      app Electron: main, carteiro, preload, renderer React
+apps/web          versão web: servidor Node (login, API, seletor de arquivos) + Dockerfile na raiz
 docs/             desenho e pesquisa
 branding/         mascote, ícones e identidade visual
 qa/, uxreview/    suítes, relatórios e capturas de QA e UI/UX

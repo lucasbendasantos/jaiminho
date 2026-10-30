@@ -1,7 +1,7 @@
 {
   "name": "jaiminho-desktop",
   "productName": "Jaiminho",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Jaiminho — cliente de API local e offline (HTTP/JSON, XML/SOAP, gRPC)",
   "author": "Lucas",
   "license": "Apache-2.0",
