@@ -2,7 +2,7 @@
 services:
   jaiminho:
     build: .
-    image: jaiminho-web:1.1.0
+    image: jaiminho-web:1.1.1
     container_name: jaiminho
     init: true                       # encerra direitinho os processos filhos (motor de envio, sandbox de scripts)
     restart: unless-stopped
