@@ -87,7 +87,7 @@ export const SECTIONS = [
       <h4>De onde vem o schema (aba <i>Schema</i>)</h4>
       <ul>
         <li><b>Reflection</b> (padrão): o Jaiminho pergunta ao servidor quais serviços e mensagens existem (tenta v1 e depois v1alpha). Nada para configurar.</li>
-        <li><b>Arquivos .proto:</b> <i>Adicionar .proto/.protoset</i> copia o arquivo <b>e os imports</b> para a pasta <code>protos/</code> do workspace, e todos os amigos passam a ter o mesmo schema.</li>
+        <li><b>Arquivos .proto:</b> <i>Adicionar .proto/.protoset</i> copia o arquivo <b>e os imports</b> para a pasta <code>protos/</code> do workspace, e todos os amigos passam a ter o mesmo schema. Se o seu .proto usa um tipo de outro arquivo <b>sem importá-lo</b>, o Jaiminho procura quem o declara na <b>pasta raiz</b> (<i>+ Pasta raiz</i>) e ao redor do arquivo, carrega junto e avisa. A opção <i>Carregar todos os .proto</i> usa tudo o que está nas pastas raiz.</li>
         <li><b>Protoset</b> (<code>.pb</code> gerado com <code>protoc --descriptor_set_out</code>) e <b>Congelar schema</b>: guarda o que a reflection devolveu para usar depois sem o servidor.</li>
       </ul>
       <h4>Tipos de chamada</h4>

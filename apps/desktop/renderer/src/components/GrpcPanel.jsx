@@ -45,6 +45,13 @@ function SchemaTab({ tab, reload }) {
     else set({ source: 'protoset', protoset: mains[0] });
     toast(`${rels.length} arquivo(s) copiado(s) para protos/ do workspace (com os imports; vão junto ao partilhar)`, 'ok');
   };
+  const addRoot = async () => {
+    const dir = await window.jaiminho.dialog.openDir({ title: 'Pasta raiz dos .proto (onde ficam os pacotes, ex.: com/empresa/…)' });
+    if (!dir) return;
+    set({ source: 'proto', importPaths: [...new Set([...(s.importPaths || []), dir])] });
+    toast('Pasta raiz adicionada: imports e tipos que faltarem serão procurados nela', 'ok', 6000);
+    reload();
+  };
   const freeze = async () => {
     const rel = await safe(() => call('grpc:freeze', { request: tab.draft, requestId: tab.itemId, environmentId: getState().activeEnvId, name: (tab.draft.url || 'schema').replace(/^grpcs?:\/\//, '') }));
     if (rel) { setProtos(await call('grpc:listProtos')); set({ fallbackProtoset: rel }); toast(`Schema congelado em ${rel} e usado como reserva se a reflection falhar`, 'ok', 6000); }
@@ -54,13 +61,16 @@ function SchemaTab({ tab, reload }) {
       <div className="row"><span style={{ width: 160 }}>Fonte do schema</span>
         <select className="in" value={s.source} onChange={(e) => { set({ source: e.target.value }); reload(); }} data-testid="grpc-source"><option value="reflection">Server reflection (v1 → v1alpha)</option><option value="proto">Arquivos .proto</option><option value="protoset">Protoset (.protoset/.pb)</option></select>
         <button className="btn sm" onClick={addFile}>+ Adicionar .proto/.protoset</button>
+        <button className="btn sm" onClick={addRoot} data-testid="grpc-add-root" title="Aponta a pasta onde estão todos os protos. Tipos que o seu .proto usar sem importar são achados ali.">+ Pasta raiz</button>
       </div>
       {s.source === 'reflection' && <div className="card col"><div className="hint">Busca o schema direto do servidor (a metadata da request também vai na reflection).</div><div className="row"><button className="btn sm" onClick={freeze} data-testid="grpc-freeze">Congelar schema (salvar protoset no workspace)</button>{s.fallbackProtoset && <span className="hint">Reserva: <span className="mono">{s.fallbackProtoset}</span></span>}</div></div>}
       {s.source === 'proto' && <div className="card col">
         <div className="hint">Arquivos .proto do workspace (pasta protos/). Imports são procurados na pasta do arquivo, nos import paths e nos google/protobuf embutidos.</div>
         {protos.filter((p) => p.endsWith('.proto')).map((p) => <label key={p} className="chk mono"><input type="checkbox" checked={(s.files || []).includes(p)} onChange={(e) => { set({ files: e.target.checked ? [...(s.files || []), p] : (s.files || []).filter((x) => x !== p) }); reload(); }} />{p}</label>)}
         {!protos.some((p) => p.endsWith('.proto')) && <div className="hint">Nenhum .proto no workspace ainda.</div>}
-        <div className="section-title">Import paths</div>
+        <label className="chk"><input type="checkbox" checked={!!s.loadAll} onChange={(e) => { set({ loadAll: e.target.checked }); reload(); }} data-testid="grpc-load-all" /> Carregar todos os .proto das pastas abaixo (como "usar todos os protos da pasta raiz")</label>
+        <div className="hint">Se o seu .proto usa um tipo de outro arquivo sem dar <code>import</code>, o Jaiminho procura o arquivo que o declara nas pastas abaixo e ao redor do .proto, carrega junto e avisa. Se não achar, diz qual tipo falta.</div>
+        <div className="section-title">Import paths / pastas raiz</div>
         <KVTable rows={(s.importPaths || []).map((p) => ({ key: p, value: '' }))} keyPh="pasta (relativa ao workspace)" valPh="" noToggle onChange={(rows) => set({ importPaths: rows.map((r) => r.key).filter(Boolean) })} />
       </div>}
       {s.source === 'protoset' && <div className="card col"><select className="in" value={s.protoset || ''} onChange={(e) => { set({ protoset: e.target.value }); reload(); }}><option value="">Escolha…</option>{protos.filter((p) => /\.(protoset|pb)$/.test(p)).map((p) => <option key={p}>{p}</option>)}</select></div>}
@@ -83,7 +93,7 @@ export default function GrpcPanel({ tab }) {
   const load = async (refresh = true) => {
     if (!d.url) return toast('Preencha o endereço do servidor (ex.: grpc://localhost:50051)', 'err');
     setLoading(true);
-    try { const r = await call('grpc:describe', { request: tab.draft, requestId: tab.itemId, environmentId: envId, refresh }); setServices(r.services); if (refresh && r.source === 'reflection') toast(`Reflection ${r.reflectionVersion}: ${r.services.length} serviço(s)`, 'ok', 2000); }
+    try { const r = await call('grpc:describe', { request: tab.draft, requestId: tab.itemId, environmentId: envId, refresh }); setServices(r.services); if (r.autoAdded && r.autoAdded.length) toast(`Faltava import: carreguei automaticamente ${r.autoAdded.map((f) => f.split(/[\\/]/).slice(-3).join('/')).join(', ')}. Para fixar, adicione o arquivo em Schema.`, 'ok', 9000); if (refresh && r.source === 'reflection') toast(`Reflection ${r.reflectionVersion}: ${r.services.length} serviço(s)`, 'ok', 2000); }
     catch (e) { setServices([]); toast(`Não consegui carregar o schema: ${e.message}`, 'err', 9000); }
     finally { setLoading(false); }
   };

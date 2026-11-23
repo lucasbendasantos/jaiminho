@@ -124,3 +124,28 @@ test('URL da página do Swagger UI com ?urls.primaryName= importa o grupo certo 
   await E.openapi.importOpenApi(ws2, { url: base, fetchText }, {});
   assert.equal(ws2.tree().collections[0].name, 'alpha');
 });
+
+test('.proto sem o import de um tipo usado: acha o arquivo que o declara (pasta raiz, ao redor) e avisa; sem candidato, erro claro', () => {
+  const S = require('../src/grpc/schema');
+  const raiz = fs.mkdtempSync(path.join(os.tmpdir(), 'jprotos-'));
+  fs.mkdirSync(path.join(raiz, 'eu', 'x'), { recursive: true }); fs.mkdirSync(path.join(raiz, 'comum'), { recursive: true });
+  const svc = path.join(raiz, 'eu', 'x', 'servico.proto');
+  fs.writeFileSync(svc, 'syntax = "proto3";\npackage eu.x.v1;\nservice Svc { rpc Verifica (Pedido) returns (Resposta); }\nmessage Pedido { comum.Pessoa pessoa = 1; Estado estado = 2; }\nmessage Resposta { bool ok = 1; }\nmessage Estado { int32 n = 1; }\n');
+  fs.writeFileSync(path.join(raiz, 'comum', 'pessoa.proto'), 'syntax = "proto3";\npackage comum;\n// message Falsa {}\nmessage Pessoa { string nome = 1; Aninhada a = 2; message Aninhada { string x = 1; } }\n');
+  // 1) só o arquivo principal, sem pasta nenhuma: acha nas pastas ao redor
+  const r1 = S.loadProtoFiles([svc], [], raiz);
+  assert.deepEqual(r1.jaiminhoAuto.map((f) => path.relative(raiz, f)), [path.join('comum', 'pessoa.proto')]);
+  assert.equal(S.listServices(r1).length, 1);
+  // 2) com a pasta raiz nos import paths
+  const r2 = S.loadProtoFiles([svc], [raiz], raiz);
+  assert.equal(r2.jaiminhoAuto.length, 1);
+  // 3) selecionando os dois, não precisa de nada automático
+  const r3 = S.loadProtoFiles([svc, path.join(raiz, 'comum', 'pessoa.proto')], [], raiz);
+  assert.equal(r3.jaiminhoAuto.length, 0);
+  // 4) tipo que não existe em lugar nenhum: erro que diz o tipo e o que fazer
+  const so = fs.mkdtempSync(path.join(os.tmpdir(), 'jsolo-'));
+  fs.writeFileSync(path.join(so, 'a.proto'), 'syntax = "proto3";\npackage a;\nmessage M { nao.Existe x = 1; }\nservice S { rpc R (M) returns (M); }\n');
+  assert.throws(() => S.loadProtoFiles([path.join(so, 'a.proto')], [], so), /tipo "nao\.Existe".*usado em a\.M.*Pasta raiz/);
+  // 5) "carregar todos" da pasta raiz via getSchema
+  return S.getSchema(null, { source: 'proto', files: [], importPaths: [raiz], loadAll: true }).then((sc) => { assert.equal(sc.services.length, 1); });
+});

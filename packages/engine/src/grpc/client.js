@@ -112,7 +112,7 @@ async function describe(ws, opts) {
   const parsed = parseTarget(resolve(req.url));
   const { credentials } = channelCredentials(ws, parsed, g.tls);
   const schema = await getSchema(ws, g.schema, { target: parsed.target, credentials, metadata: toMetadata(g.metadata, resolve), channelOptions: channelOptions(ws, g.options), cacheTag: JSON.stringify(g.tls || {}) }, { refresh: !!opts.refresh });
-  return { services: schema.services, source: schema.source, reflectionVersion: schema.reflectionVersion, schema };
+  return { services: schema.services, source: schema.source, reflectionVersion: schema.reflectionVersion, autoAdded: schema.autoAdded || [], schema };
 }
 
 /**

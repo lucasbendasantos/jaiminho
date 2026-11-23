@@ -1,5 +1,9 @@
 # Changelog
 
+## Próxima versão
+- gRPC com `.proto`: quando um arquivo usa um tipo de outro `.proto` **sem importá-lo** (o `protoc` recusaria, Postman e Kreya aceitam), o Jaiminho acha o arquivo que declara o tipo na pasta raiz ou ao redor, carrega junto e avisa quais foram carregados. Sem candidato, o erro diz qual tipo falta e o que fazer.
+- Novo botão **+ Pasta raiz** (Schema → Arquivos .proto) e opção **Carregar todos os .proto** das pastas raiz.
+
 ## 1.1.0 · 2026-10-30
 
 **Novo**

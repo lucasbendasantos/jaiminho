@@ -2,6 +2,7 @@
 // Fontes de schema gRPC: reflection, arquivos .proto (com import paths) e protoset (FileDescriptorSet).
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const crypto = require('crypto');
 const protobuf = require('protobufjs');
 const descriptor = require('protobufjs/ext/descriptor');
@@ -23,12 +24,68 @@ function stripEmptyStatements(src) {
   return out;
 }
 
+
+/** Lista .proto de uma pasta (recursivo, com limites para não varrer o disco inteiro). */
+function scanProtos(dir, { maxDepth = 6, max = 3000 } = {}) {
+  const out = []; let visitadas = 0;
+  const walk = (d, depth) => {
+    if (out.length >= max || depth > maxDepth || visitadas > 20000) return;
+    let ents; try { ents = fs.readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const e of ents) {
+      visitadas++;
+      if (e.name === 'node_modules' || e.name === '.git' || e.name.startsWith('.')) continue;
+      const f = path.join(d, e.name);
+      if (e.isDirectory()) walk(f, depth + 1);
+      else if (/\.proto$/i.test(e.name)) { out.push(f); if (out.length >= max) return; }
+    }
+  };
+  walk(dir, 0);
+  return out;
+}
+
+/** Nomes completos (pacote.Mensagem.Aninhada) declarados por um .proto, sem precisar do parser completo. */
+function declaredNames(file) {
+  let src; try { src = stripEmptyStatements(fs.readFileSync(file).toString('utf8')); } catch { return new Set(); } // (durante o load o readFileSync de .proto está remendado e devolve Buffer)
+  src = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ').replace(/"(?:[^"\\]|\\.)*"/g, '""');
+  const pkg = (/^\s*package\s+([\w.]+)\s*;/m.exec(src) || [])[1] || '';
+  const names = new Set(); const stack = [];
+  const re = /\b(message|enum|service|extend|oneof)\s+([\w.]+)\s*\{|\{|\}/g; let m;
+  while ((m = re.exec(src))) {
+    if (m[0] === '}') { stack.pop(); continue; }
+    if (m[0] === '{') { stack.push(null); continue; }
+    const kind = m[1]; const nm = m[2];
+    if (kind === 'message' || kind === 'enum') { stack.push(nm); names.add([pkg, ...stack.filter(Boolean)].filter(Boolean).join('.')); }
+    else stack.push(null);
+  }
+  return names;
+}
+
+/** Procura, nas pastas dadas, um .proto que declare o tipo [name] (como escrito no .proto de [scope]). */
+function locateType(name, scope, dirs, skip, cache) {
+  const abs = name.startsWith('.');
+  const w = name.replace(/^\./, '');
+  const want = new Set();
+  if (abs) want.add(w);
+  else {
+    const parts = (scope || '').replace(/^\./, '').split('.').filter(Boolean);
+    for (let i = parts.length; i >= 0; i--) want.add([...parts.slice(0, i), w].join('.'));
+  }
+  const files = [];
+  for (const d of dirs) for (const f of (cache.scan.get(d) || (cache.scan.set(d, scanProtos(d)), cache.scan.get(d)))) if (!files.includes(f)) files.push(f);
+  const hits = [];
+  for (const f of files) {
+    if (skip.has(path.resolve(f))) continue;
+    const names = cache.decl.get(f) || (cache.decl.set(f, declaredNames(f)), cache.decl.get(f));
+    for (const n of names) { if (want.has(n) || (!scope && (n === w || n.endsWith('.' + w)))) { hits.push(f); break; } }
+  }
+  return hits;
+}
+
 /** Carrega .proto: procura na pasta do arquivo → import paths (na ordem) → WKT embutidos do protobufjs. */
 function loadProtoFiles(files, importPaths = [], baseDir) {
-  const root = new protobuf.Root();
   const absFiles = files.map((f) => (path.isAbsolute(f) ? f : path.join(baseDir || process.cwd(), f)));
   const dirs = importPaths.map((p) => (path.isAbsolute(p) ? p : path.join(baseDir || process.cwd(), p)));
-  root.resolvePath = (origin, target) => {
+  const resolvePath = (origin, target) => {
     if (path.isAbsolute(target) && fs.existsSync(target)) return target;
     if (protobuf.common[target] !== undefined) return target;
     const candidates = [];
@@ -45,15 +102,40 @@ function loadProtoFiles(files, importPaths = [], baseDir) {
   // protoc aceita ";;" (instrução vazia); o parser do protobufjs não. Corrige o texto só durante a leitura.
   const nodeFs = protobuf.util.fs; const origRead = nodeFs && nodeFs.readFileSync;
   if (origRead) nodeFs.readFileSync = function (f, ...rest) { const b = origRead.call(this, f, ...rest); return /\.proto$/i.test(String(f)) ? Buffer.from(stripEmptyStatements(b.toString('utf8')), 'utf8') : b; };
+  // Imports que faltam no .proto (o protoc recusaria; Postman/Kreya não): acha o arquivo que declara o tipo e carrega junto.
+  const searchDirs = [...new Set([...dirs, ...absFiles.flatMap((f) => { const o = []; let d = path.dirname(f); for (let i = 0; i < 6; i++) { const u = path.dirname(d); if (u === d || d === os.homedir()) break; o.push(d); d = u; } return o; })])];
+  const cache = { scan: new Map(), decl: new Map() };
+  const auto = []; let root;
   try {
-    root.loadSync(absFiles, { keepCase: true, alternateCommentMode: true });
-    root.resolveAll();
-  } catch (e) {
-    const miss = /ENOENT[^']*'([^']+)'/.exec(e.message);
-    if (miss) throw new Error(`Import não encontrado: "${miss[1]}". Adicione esse arquivo (ou a pasta raiz dos .proto) em Schema → Import paths, ou use "+ Adicionar .proto" que copia os imports junto.`);
-    throw new Error(`Erro ao ler .proto: ${e.message}`);
-  }
-  finally { if (origRead) nodeFs.readFileSync = origRead; }
+    for (let tentativa = 0; ; tentativa++) {
+      root = new protobuf.Root(); root.resolvePath = resolvePath;
+      try {
+        root.loadSync([...absFiles, ...auto], { keepCase: true, alternateCommentMode: true });
+        root.resolveAll();
+        break;
+      } catch (e) {
+        const falta = /no such (?:Type or Enum|Type|type|Enum|Service)[: ]+'?([.\w]+)'?(?: in (?:Type|Service|Method|Field|Message)? ?(\S+))?/.exec(e.message);
+        if (falta && tentativa < 40) {
+          const skip = new Set([...absFiles, ...auto].map((f) => path.resolve(f)));
+          // 1º as pastas de import; só se não achar, as pastas ao redor do arquivo (mais lento)
+          let hits = locateType(falta[1], falta[2], dirs, skip, cache);
+          // pastas ao redor do arquivo: da mais perto para a mais longe; para na primeira que tiver o tipo
+          for (let i = 0; !hits.length && i < searchDirs.length; i++) hits = locateType(falta[1], falta[2], [searchDirs[i]], skip, cache);
+          if (hits.length) {
+            // vários candidatos: o mais perto (em pastas) do arquivo que pediu o tipo
+            const ref = absFiles[0]; const comum = (f) => { const a = path.dirname(f).split(path.sep), b = path.dirname(ref).split(path.sep); let i = 0; while (i < a.length && a[i] === b[i]) i++; return i; };
+            hits.sort((x, y) => comum(y) - comum(x));
+            auto.push(hits[0]); continue;
+          }
+          throw new Error(`O tipo "${falta[1].replace(/^\./, '')}"${falta[2] ? ` (usado em ${falta[2].replace(/^\./, '')})` : ''} não está em nenhum .proto carregado e não achei nenhum arquivo que o declare nas pastas conhecidas. Adicione o .proto que o define, ou use "+ Pasta raiz" para apontar a pasta onde estão os protos.`);
+        }
+        const miss = /ENOENT[^']*'([^']+)'/.exec(e.message);
+        if (miss) throw new Error(`Import não encontrado: "${miss[1]}". Adicione esse arquivo (ou a pasta raiz dos .proto) em Schema → Import paths, ou use "+ Adicionar .proto" que copia os imports junto.`);
+        throw new Error(e.message.startsWith('O tipo ') ? e.message : `Erro ao ler .proto: ${e.message}`);
+      }
+    }
+  } finally { if (origRead) nodeFs.readFileSync = origRead; }
+  root.jaiminhoAuto = auto;
   return root;
 }
 
@@ -144,13 +226,15 @@ async function getSchema(ws, schemaCfg = {}, conn = {}, { refresh = false } = {}
   const baseDir = ws ? ws.dir : process.cwd();
   if (source === 'proto') {
     const files = (schemaCfg.files || []).map((f) => (path.isAbsolute(f) ? f : path.join(baseDir, f)));
-    if (!files.length) throw new Error('Nenhum arquivo .proto selecionado');
     const importPaths = [...(schemaCfg.importPaths || []), ...((ws && ws.settings.grpc && ws.settings.grpc.importPaths) || []), ws ? path.join(ws.dir, 'protos') : undefined].filter(Boolean);
+    // "Carregar todos": todos os .proto das pastas raiz escolhidas pelo usuário (não da pasta protos/ do workspace)
+    if (schemaCfg.loadAll) for (const d of schemaCfg.importPaths || []) for (const f of scanProtos(path.isAbsolute(d) ? d : path.join(baseDir, d))) if (!files.includes(f)) files.push(f);
+    if (!files.length) throw new Error('Nenhum arquivo .proto selecionado');
     const stamp = files.concat(importPaths).map((f) => { try { return `${f}:${fs.statSync(f).mtimeMs}`; } catch { return f; } });
-    const key = cacheKey(['proto', stamp]);
+    const key = cacheKey(['proto', stamp, !!schemaCfg.loadAll]);
     if (!refresh && cache.has(key)) return cache.get(key);
     const root = loadProtoFiles(files, importPaths, baseDir);
-    const schema = { source, root, services: listServices(root) };
+    const schema = { source, root, services: listServices(root), autoAdded: root.jaiminhoAuto || [] };
     cache.set(key, schema); return schema;
   }
   if (source === 'protoset') {
@@ -204,4 +288,4 @@ function addProtoToWorkspace(wsDir, file) {
   return copied.map((c) => path.relative(wsDir, c.dest).split(path.sep).join('/'));
 }
 
-module.exports = { addProtoToWorkspace, getSchema, loadProtoFiles, loadProtoset, toProtoset, listServices, findMethod, rootFromDescriptorFiles, clearCache };
+module.exports = { scanProtos, declaredNames, locateType, addProtoToWorkspace, getSchema, loadProtoFiles, loadProtoset, toProtoset, listServices, findMethod, rootFromDescriptorFiles, clearCache };

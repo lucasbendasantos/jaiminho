@@ -145,7 +145,7 @@ const ops = {
   'exec:cancel': ({ execId }) => { const e = execs.get(execId); if (e) e.cancel(); return !!e; },
   'grpc:write': ({ execId, message }) => { const e = execs.get(execId); if (!e || !e.handle) throw new Error('Stream não está aberto'); e.handle.write(message); return true; },
   'grpc:end': ({ execId }) => { const e = execs.get(execId); if (e && e.handle) e.handle.end(); return !!e; },
-  'grpc:describe': async ({ request, requestId, environmentId, refresh }) => { const d = await E.grpc.describe(need(), { request, requestId, environmentId, refresh }); return { services: d.services, source: d.source, reflectionVersion: d.reflectionVersion }; },
+  'grpc:describe': async ({ request, requestId, environmentId, refresh }) => { const d = await E.grpc.describe(need(), { request, requestId, environmentId, refresh }); return { services: d.services, source: d.source, reflectionVersion: d.reflectionVersion, autoAdded: d.autoAdded || [] }; },
   'grpc:sample': async ({ request, requestId, environmentId, method }) => {
     const d = await E.grpc.describe(need(), { request, requestId, environmentId });
     const m = E.grpc.findMethod(d.schema.root, method);
