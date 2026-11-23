@@ -1,0 +1,26 @@
+name: windows
+
+# Gera o instalador (NSIS) e o portátil para Windows. Rode em Actions → windows → Run workflow.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  instaladores:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: node scripts/package-win.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jaiminho-windows
+          path: |
+            release/*.exe
+          if-no-files-found: error
